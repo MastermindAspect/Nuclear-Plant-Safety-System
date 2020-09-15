@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "2198264886",
+    "firebase_url": "https://nuclear-plant-safety-system.firebaseio.com",
+    "project_id": "nuclear-plant-safety-system",
+    "storage_bucket": "nuclear-plant-safety-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:2198264886:android:9981f5ad4b2882d36bcc97",
+        "android_client_info": {
+          "package_name": "com.example.npssapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "2198264886-s7va1ddp80130q6skc85adj3r0vjbj34.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.npssapp",
+            "certificate_hash": "052dba093adeeeef1ea4f22d3ca4ba8fbe34270b"
+          }
+        },
+        {
+          "client_id": "2198264886-maq2bltk27vp5jg33g25asom7cm5tdmj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEnQ3-6xXsr6u5Q-h9ROQrDqa1vNAV29M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "2198264886-maq2bltk27vp5jg33g25asom7cm5tdmj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
