@@ -5,13 +5,16 @@ import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import com.google.firebase.iid.FirebaseInstanceId
 
-val database = Firebase.database.reference
 
 @IgnoreExtraProperties
-data class Employee(val uid: Int = 0, val title: String = "")
+data class Employee(val uid: Int = 0, val title: String = "", val clockIn : String = "", val registrationToken : String = FirebaseInstanceId.getInstance().id, val clockInOut : HashMap<String,String> = HashMap<String,String>())
 
 fun createNewEmployee(uId: Int,title: String): Array<String> {
+    val database = Firebase.database.reference
     val employee = Employee(uId, title)
     var outcome : Array<String> = arrayOf<String>()
     val titles : Array<String> = arrayOf("Nuclear technician", "Power plant manager", "Console operator")
@@ -26,9 +29,26 @@ fun createNewEmployee(uId: Int,title: String): Array<String> {
     return outcome
 }
 
-fun getEmployee(uId: Int, callback: (result: Employee?) -> Unit){
-    val employees = database.child("employees")
-    employees.addListenerForSingleValueEvent(object: ValueEventListener{
+fun clockInEmployee(uId: Int, title: String = "") {
+    val database = Firebase.database.reference.child("online").child(uId.toString())
+    var employeeTitle = title
+    getEmployee(uId) {
+        val currentDateTime = LocalDateTime.now()
+        if (it == null) createNewEmployee(uId, title)
+        else employeeTitle = it.title
+        val map = mutableMapOf<String, Any>()
+        map["uid"] = uId
+        map["title"] = employeeTitle
+        map["clockIn"] = currentDateTime.format(DateTimeFormatter.ISO_DATE)
+        database.setValue(map)
+    }
+}
+
+fun clockOutEmployee(uId: Int){
+    val databaseOnlineRef = Firebase.database.reference.child("online")
+    val databaseEmployeeRef = Firebase.database.reference.child("employees").child(uId.toString()).child("clockInOut")
+
+    databaseOnlineRef.addListenerForSingleValueEvent(object: ValueEventListener{
         override fun onCancelled(error: DatabaseError) {
         }
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -37,16 +57,43 @@ fun getEmployee(uId: Int, callback: (result: Employee?) -> Unit){
                 val childEmployee = it.getValue(Employee::class.java)
                 if (childEmployee != null) {
                     if (childEmployee.uid == uId){
-                        callback.invoke(childEmployee)
+                        val currentDateTime = LocalDateTime.now()
+                        val map = hashMapOf<String,String>()
+                        map[childEmployee.clockIn] = currentDateTime.format(DateTimeFormatter.ISO_DATE)
+                        databaseEmployeeRef.setValue(map)
+                        it.ref.removeValue()
                     }
                 }
-                else callback(null)
             }
         }
     })
 }
 
+fun getEmployee(uId: Int, callback: (result: Employee?) -> Unit){
+    val database = Firebase.database.reference
+    val employees = database.child("employees")
+
+    employees.addListenerForSingleValueEvent(object: ValueEventListener{
+        override fun onCancelled(error: DatabaseError) {
+        }
+        override fun onDataChange(snapshot: DataSnapshot) {
+            val employeeDetails = snapshot.children
+            employeeDetails.forEach {
+
+                val childEmployee = it.getValue(Employee::class.java)
+                if (childEmployee != null) {
+                    if (childEmployee.uid == uId){
+                        callback.invoke(childEmployee)
+                    }
+                }
+            }
+            callback.invoke(null)
+        }
+    })
+}
+
 fun deleteEmployee(uId:Int) : Boolean{
+    val database = Firebase.database.reference
     val employees = database.child("employees")
     var outcome : Boolean = false
     employees.addListenerForSingleValueEvent(object: ValueEventListener{
