@@ -1,13 +1,11 @@
-#include <Arduino.h>
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include <MFRC522.h>
 
 #define SS_PIN 10
 #define RST_PIN 9
-
 MFRC522 mfrc522(SS_PIN, RST_PIN);
-SoftwareSerial hc06(1, 2);
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,9 +14,6 @@ void setup() {
   mfrc522.PCD_Init();
   Serial.println("Approximate your card to the reader...");
   Serial.println();
-
-  // Init bluetooth serial port
-  hc06.begin(9600);
 }
 
 void loop() {
@@ -32,18 +27,10 @@ void loop() {
     return;
   }
 
-  if (hc06.available()){
-      Serial.write(hc06.read());
-  }
-
-  // Write from Serial monitor to hc06
-  if (Serial.available()){
-      hc06.write(Serial.read());
-  }
-
   // Show UID on serial monitor
   Serial.print("UID tag :");
   String content = "";
+  byte letter;
   for (byte i = 0; i < mfrc522.uid.size; i++) {
     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
     Serial.print(mfrc522.uid.uidByte[i], HEX);
