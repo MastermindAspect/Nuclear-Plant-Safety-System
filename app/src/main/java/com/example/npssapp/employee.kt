@@ -44,6 +44,25 @@ fun clockInEmployee(uId: Int, title: String = "") {
     }
 }
 
+fun isClockedIn(uId:Int,callback: (result: Boolean?) -> Unit){
+    var result : Boolean? = null
+    val databaseOnlineRef = Firebase.database.reference.child("online")
+    databaseOnlineRef.addListenerForSingleValueEvent(object: ValueEventListener{
+        override fun onCancelled(error: DatabaseError) {
+        }
+        override fun onDataChange(snapshot: DataSnapshot) {
+            val employeeDetails = snapshot.children
+            employeeDetails.forEach {
+                val childEmployee = it.getValue(Employee::class.java)
+                if (childEmployee != null) {
+                    result = childEmployee.uid == uId
+                    callback(result)
+                }
+            }
+        }
+    })
+}
+
 fun clockOutEmployee(uId: Int){
     val databaseOnlineRef = Firebase.database.reference.child("online")
     val databaseEmployeeRef = Firebase.database.reference.child("employees").child(uId.toString()).child("clockInOut")
@@ -72,7 +91,6 @@ fun clockOutEmployee(uId: Int){
 fun getEmployee(uId: Int, callback: (result: Employee?) -> Unit){
     val database = Firebase.database.reference
     val employees = database.child("employees")
-
     employees.addListenerForSingleValueEvent(object: ValueEventListener{
         override fun onCancelled(error: DatabaseError) {
         }
