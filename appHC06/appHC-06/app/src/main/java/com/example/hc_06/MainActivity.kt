@@ -36,9 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         refresh.setOnClickListener{
              pairedDeviceList()
-
         }
-
     }
 
     private fun pairedDeviceList(){
