@@ -28,20 +28,20 @@ class MainActivity : AppCompatActivity() {
             Log.d("Crash", "Bluetooth not supported on this device!")
             return
         }
-
+        Bluetooth(this).start()
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
             if (resultCode == Activity.RESULT_OK) {
                 if (mBluetoothAdapter.isEnabled) {
-                    Toast.makeText(applicationContext, "Bluetooth has been enabled", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Bluetooth has been enabled", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(applicationContext, "Bluetooth has been disabled", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Bluetooth has been disabled", Toast.LENGTH_SHORT).show()
 
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(applicationContext, "Bluetooth enabling has been canceled", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Bluetooth enabling has been canceled", Toast.LENGTH_SHORT).show()
             }
         }
     }

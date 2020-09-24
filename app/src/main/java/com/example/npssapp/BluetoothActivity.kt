@@ -21,28 +21,6 @@ import kotlinx.coroutines.NonCancellable.start
 import java.io.IOException
 import java.util.*
 
-/*mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-if(!mBluetoothAdapter.isEnabled) {
-    val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-    startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH)
-}
-override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
-        if (resultCode == Activity.RESULT_OK) {
-            if (mBluetoothAdapter.isEnabled) {
-                Toast.makeText(headContext, "Bluetooth has been enabled", Toast.LENGTH_SHORT).show()
-
-            } else {
-                Toast.makeText(headContext, "Bluetooth has been disabled", Toast.LENGTH_SHORT).show()
-
-            }
-        } else if (resultCode == Activity.RESULT_CANCELED) {
-            Toast.makeText(headContext, "Bluetooth enabling has been canceled", Toast.LENGTH_SHORT).show()
-        }
-    }
-}
- */
 class Bluetooth(c:Context) : Thread() {
 
     companion object {
@@ -50,8 +28,8 @@ class Bluetooth(c:Context) : Thread() {
         lateinit var mProgress : ProgressDialog
         lateinit var mBluetoothAdapter : BluetoothAdapter
         var mIsConnected : Boolean = false
-        val mAddress : String ="MAC_ADRESS"
-        var mUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+        const val mAddress : String ="98:D3:41:F9:76:43"
+        val mUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     }
     private val headContext = c
 
