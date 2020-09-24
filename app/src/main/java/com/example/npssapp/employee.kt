@@ -34,7 +34,7 @@ fun clockInEmployee(uId: Int, title: String = "") {
     var employeeTitle = title
     getEmployee(uId) {
         val currentDateTime = LocalDateTime.now()
-        if (it == null) createNewEmployee(uId, title)
+        if (it == null) createNewEmployee(uId, "Nuclear technician")
         else employeeTitle = it.title
         val map = mutableMapOf<String, Any>()
         map["uid"] = uId

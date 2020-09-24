@@ -1,6 +1,7 @@
 package com.example.npssapp
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     companion object{
         lateinit var mBluetoothAdapter: BluetoothAdapter
         const val REQUEST_ENABLE_BLUETOOTH = 1
+        lateinit var mProgress : ProgressDialog
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("Crash", "Bluetooth not supported on this device!")
             return
         }
+        mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
         Bluetooth(this).start()
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
