@@ -31,9 +31,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
+        //TODO("Pass user's id instead of static 123")
         val notificationHandler = WarningNotificationHandler(123, this)
         createNotificationChannel()
-        //TODO("Pass user's id instead of static 123")
+        //User id here as well instead of 123
         notificationHandler.listenForClockInEntry(123)
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
@@ -65,8 +66,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.channel_name)
             val descriptionText = getString(R.string.channel_description)

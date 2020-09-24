@@ -33,18 +33,18 @@ data class WarningNotificationHandler(val uid: Int, val context: Context) : Seri
                 TODO("Not yet implemented")
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val newChildUid = snapshot.child("uid").value.toString()
+                val newChildNodeUid = snapshot.child("uid").value.toString()
 
-                if (newChildUid == uId.toString()) {
+                if (newChildNodeUid == uId.toString()) {
                     var totalRadiationExposure = 0.0
 
                     while(totalRadiationExposure < 500000) {
                         Thread.sleep(1_000)
 
-                        //TODO("Get current values of these three variables every loop")
-                        var reactorRadiation = 30
-                        var roomCoefficient = 1.6
-                        var protectiveCoefficient = 5
+                        //TODO("Get current values of these three variables for every loop")
+                        var reactorRadiation = 30 //default value 30, can be change between 1-100 on console
+                        var roomCoefficient = 1.6 //changes depending on what room user is in
+                        var protectiveCoefficient = 5 //changes depending on what clothing/equipment user is wearing
 
                         totalRadiationExposure += radiationPerSecond(reactorRadiation, roomCoefficient, protectiveCoefficient)
                         Log.i("Radiation status",
