@@ -44,8 +44,7 @@ fun clockInEmployee(uId: String, title: String = "") {
     }
 }
 
-fun isClockedIn(uId:String,callback: (result: Boolean?) -> Unit){
-    var result : Boolean? = null
+fun isClockedIn(uId: String, callback: (result: Boolean) -> Unit){
     val databaseOnlineRef = Firebase.database.reference.child("online")
     databaseOnlineRef.addListenerForSingleValueEvent(object: ValueEventListener{
         override fun onCancelled(error: DatabaseError) {
@@ -55,10 +54,11 @@ fun isClockedIn(uId:String,callback: (result: Boolean?) -> Unit){
             employeeDetails.forEach {
                 val childEmployee = it.getValue(Employee::class.java)
                 if (childEmployee != null) {
-                    result = childEmployee.uid == uId
+                    val result = childEmployee.uid == uId
                     callback(result)
                 }
             }
+            callback(false)
         }
     })
 }
