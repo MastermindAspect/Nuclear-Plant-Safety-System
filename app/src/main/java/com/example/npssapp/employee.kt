@@ -11,9 +11,9 @@ import com.google.firebase.iid.FirebaseInstanceId
 
 
 @IgnoreExtraProperties
-data class Employee(val uid: Int = 0, val title: String = "", val clockIn : String = "", val registrationToken : String = FirebaseInstanceId.getInstance().id, val clockInOut : HashMap<String,String> = HashMap<String,String>())
+data class Employee(val uid: String = "", val title: String = "", val clockIn : String = "", val registrationToken : String = FirebaseInstanceId.getInstance().id, val clockInOut : HashMap<String,String> = HashMap<String,String>())
 
-fun createNewEmployee(uId: Int,title: String): Array<String> {
+fun createNewEmployee(uId: String,title: String): Array<String> {
     val database = Firebase.database.reference
     val employee = Employee(uId, title)
     var outcome : Array<String> = arrayOf<String>()
@@ -29,7 +29,7 @@ fun createNewEmployee(uId: Int,title: String): Array<String> {
     return outcome
 }
 
-fun clockInEmployee(uId: Int, title: String = "") {
+fun clockInEmployee(uId: String, title: String = "") {
     val database = Firebase.database.reference.child("online").child(uId.toString())
     var employeeTitle = title
     getEmployee(uId) {
@@ -44,7 +44,7 @@ fun clockInEmployee(uId: Int, title: String = "") {
     }
 }
 
-fun isClockedIn(uId:Int,callback: (result: Boolean?) -> Unit){
+fun isClockedIn(uId:String,callback: (result: Boolean?) -> Unit){
     var result : Boolean? = null
     val databaseOnlineRef = Firebase.database.reference.child("online")
     databaseOnlineRef.addListenerForSingleValueEvent(object: ValueEventListener{
@@ -63,7 +63,7 @@ fun isClockedIn(uId:Int,callback: (result: Boolean?) -> Unit){
     })
 }
 
-fun clockOutEmployee(uId: Int){
+fun clockOutEmployee(uId: String){
     val databaseOnlineRef = Firebase.database.reference.child("online")
     val databaseEmployeeRef = Firebase.database.reference.child("employees").child(uId.toString()).child("clockInOut")
 
@@ -88,7 +88,7 @@ fun clockOutEmployee(uId: Int){
     })
 }
 
-fun getEmployee(uId: Int, callback: (result: Employee?) -> Unit){
+fun getEmployee(uId: String, callback: (result: Employee?) -> Unit){
     val database = Firebase.database.reference
     val employees = database.child("employees")
     employees.addListenerForSingleValueEvent(object: ValueEventListener{
@@ -110,7 +110,7 @@ fun getEmployee(uId: Int, callback: (result: Employee?) -> Unit){
     })
 }
 
-fun deleteEmployee(uId:Int) : Boolean{
+fun deleteEmployee(uId:String) : Boolean{
     val database = Firebase.database.reference
     val employees = database.child("employees")
     var outcome : Boolean = false

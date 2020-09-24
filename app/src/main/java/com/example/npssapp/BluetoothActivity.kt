@@ -34,9 +34,7 @@ class Bluetooth() : Thread() {
     }
 
     override fun run() {
-        runBlocking {
-            ConnectToDevice().execute()
-        }
+        ConnectToDevice().execute()
         while(!Thread.currentThread().isInterrupted && mBluetoothSocket!=null && mIsConnected){
             Log.d("Connect", "We are connected to bluetooth device.")
             retrieveData(mBluetoothSocket!!)// retrieve data from module then do necessary thing
@@ -58,13 +56,13 @@ class Bluetooth() : Thread() {
             val bytes = ByteArray(available)
             inputStream.read(bytes, 0, available)
             val uId = String(bytes)
-            isClockedIn(uId.toInt()) {
+            isClockedIn(uId) {
                 if (it == true) {
-                    clockOutEmployee(uId.toInt())
+                    clockOutEmployee(uId)
                     sendCommand("Success on logging out!")
                 }
                 else {
-                    clockInEmployee(uId.toInt())
+                    clockInEmployee(uId)
                     sendCommand("Success on logging in!")
                 }
             }
