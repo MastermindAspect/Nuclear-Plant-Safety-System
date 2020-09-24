@@ -1,11 +1,8 @@
 package com.example.npssapp
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.RingtoneManager
-import android.os.Build
 import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -16,8 +13,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.io.Serializable
-import java.util.*
-import kotlin.concurrent.schedule
 
 
 data class WarningNotificationHandler(val uid: Int, val context: Context) : Serializable {
@@ -38,15 +33,26 @@ data class WarningNotificationHandler(val uid: Int, val context: Context) : Seri
                 TODO("Not yet implemented")
             }
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val newChildUid = snapshot.child("uid").value.toString()
 
-                if (snapshot.child("uid").value.toString() == uId.toString()) {
-                    val timer = Timer("schedule", true)
+                if (newChildUid == uId.toString()) {
+                    var totalRadiationExposure = 0.0
 
-                    //TODO("Delay until radiation limit is almost reached (in milliseconds)")
-                    timer.schedule(3000) {
-                        sendRadiationNotification()
-                        wakePhoneScreen()
+                    while(totalRadiationExposure < 500000) {
+                        Thread.sleep(1_000)
+
+                        //TODO("Get current values of these three variables every loop")
+                        var reactorRadiation = 30
+                        var roomCoefficient = 1.6
+                        var protectiveCoefficient = 5
+
+                        totalRadiationExposure += radiationPerSecond(reactorRadiation, roomCoefficient, protectiveCoefficient)
+                        Log.i("Radiation status",
+                            "User radiation exposure is currently: $totalRadiationExposure"
+                        )
                     }
+                    sendRadiationNotification()
+                    wakePhoneScreen()
                 }
             }
             override fun onChildRemoved(snapshot: DataSnapshot) {
@@ -58,17 +64,21 @@ data class WarningNotificationHandler(val uid: Int, val context: Context) : Seri
         })
     }
 
+    fun radiationPerSecond(reactorRadiation: Int, roomCoefficient: Double, protectiveCoefficient: Int): Double {
+        return reactorRadiation * roomCoefficient / protectiveCoefficient
+    }
+
     fun sendRadiationNotification() {
         //intent which determines where user ends up when pressing notification
-        var intent = Intent(context, MainActivity::class.java).apply {
+        val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
-        var builder = NotificationCompat.Builder(context, 5.toString())
+        val builder = NotificationCompat.Builder(context, 5.toString())
             .setSmallIcon(R.drawable.ic_stat_warning)
-            .setContentTitle("Radiation limit almost reached.")
-            .setContentText("WARNING: You are about to reach the radiation limit.")
+            .setContentTitle("Radiation limit reached.")
+            .setContentText("WARNING: You have reached the radiation limit.")
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
@@ -81,14 +91,9 @@ data class WarningNotificationHandler(val uid: Int, val context: Context) : Seri
 
     fun wakePhoneScreen() {
         val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val screenOn =
-            if (Build.VERSION.SDK_INT >= 20) {
-                pm.isInteractive
-            } else {
-                pm.isScreenOn
-            }
+        val screenOn = pm.isInteractive
 
-            if (!screenOn) {
+        if (!screenOn) {
                 val wl = pm.newWakeLock(
                     PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
                     "app:radiationWarning"
