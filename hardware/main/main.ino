@@ -51,11 +51,15 @@ void loop(){
   for (byte i = 0; i < mfrc522.uid.size; i++){
     uid += String(mfrc522.uid.uidByte[i], HEX);
   }
-  Serial.print("Should send following: ");
-  Serial.print(uid);
+  //Serial.print("Should send following: ");
+  //Serial.print(uid);
   Serial.println();
+  //lcd.print("logged in");
   // Sends string to bluetooth unit
   hc06.print(uid);
+  uid ="";
+  delay(5000);
+  
 
 
   // set the cursor to column 0, line 1
@@ -65,5 +69,5 @@ void loop(){
   lcd.print(millis() / 1000);
 
   
-  delay(3000);
+  delay(1000);
 }
