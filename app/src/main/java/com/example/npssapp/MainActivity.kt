@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
-        Bluetooth(this).start()
+        Bluetooth().start()
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

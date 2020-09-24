@@ -19,10 +19,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.npssapp.MainActivity.Companion.mProgress
 import kotlinx.coroutines.NonCancellable.start
+import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.*
 
-class Bluetooth(c:Context) : Thread() {
+class Bluetooth() : Thread() {
 
     companion object {
         var mBluetoothSocket : BluetoothSocket? = null
@@ -31,10 +32,11 @@ class Bluetooth(c:Context) : Thread() {
         const val mAddress : String ="98:D3:41:F9:76:43"
         val mUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
     }
-    private val headContext = c
 
     override fun run() {
-        ConnectToDevice(headContext).execute()
+        runBlocking {
+            ConnectToDevice().execute()
+        }
         while(!Thread.currentThread().isInterrupted && mBluetoothSocket!=null && mIsConnected){
             Log.d("Connect", "We are connected to bluetooth device.")
             retrieveData(mBluetoothSocket!!)// retrieve data from module then do necessary thing
@@ -84,9 +86,8 @@ class Bluetooth(c:Context) : Thread() {
         }
     }
 
-    private class ConnectToDevice(c: Context) : AsyncTask<Void, Void, String>() {
+    private class ConnectToDevice() : AsyncTask<Void, Void, String>() {
         private var connectSuccess: Boolean = true
-        private val context: Context = c
 
         override fun doInBackground(vararg p0: Void?): String? {
             try {
