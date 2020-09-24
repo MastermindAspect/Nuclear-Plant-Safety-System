@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.npssapp.MainActivity.Companion.mProgress
 import kotlinx.coroutines.NonCancellable.start
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.*
@@ -35,48 +36,6 @@ class Bluetooth() : Thread() {
 
     override fun run() {
         ConnectToDevice().execute()
-        // TODO FIX THIS, SHOULD NOT BE A SLEEP
-        Thread.sleep(5000)
-        while(!Thread.currentThread().isInterrupted && mBluetoothSocket!=null && mIsConnected){
-            Log.d("Connect", "We are connected to bluetooth device.")
-            retrieveData(mBluetoothSocket!!)// retrieve data from module then do necessary thing
-        }
-    }
-    private fun sendCommand(input: String){
-        if (mBluetoothSocket != null) {
-            try{
-                mBluetoothSocket!!.outputStream.write(input.toByteArray())
-            } catch(e: IOException) {
-                e.printStackTrace()
-            }
-        }
-    }
-    private fun retrieveData(socket: BluetoothSocket){
-        val inputStream = socket.inputStream
-        try {
-            val available = inputStream.available()
-            val bytes = ByteArray(available)
-            inputStream.read(bytes, 0, available)
-            val uId = String(bytes)
-            if (uId.length >= 8 ) {
-                isClockedIn(uId) {
-                    if (it) {
-                        clockOutEmployee(uId)
-                        sendCommand("Success on logging out!")
-
-                    }
-                    else {
-                        clockInEmployee(uId)
-                        sendCommand("Success on logging in!")
-                    }
-                }
-                inputStream.reset()
-            }
-
-
-        } catch (e: IOException) {
-            Log.e("client", "Cannot read data", e)
-        }
     }
 
     private fun disconnect(){
@@ -110,15 +69,52 @@ class Bluetooth() : Thread() {
             }
             return null
         }
+        private fun sendCommand(input: String){
+            if (mBluetoothSocket != null) {
+                try{
+                    mBluetoothSocket!!.outputStream.write(input.toByteArray())
+                } catch(e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        private fun retrieveData(socket: BluetoothSocket){
+            val inputStream = socket.inputStream
+            try {
+                val available = inputStream.available()
+                val bytes = ByteArray(available)
+                inputStream.read(bytes, 0, available)
+                val uId = String(bytes)
+                if (uId.length >= 8 ) {
+                    isClockedIn(uId) {
+                        if (it) {
+                            clockOutEmployee(uId)
+                            sendCommand("Success on logging out!")
+                        }
+                        else {
+                            clockInEmployee(uId)
+                            sendCommand("Success on logging in!")
+                        }
+                    }
+                    inputStream.reset()
+                }
+            } catch (e: IOException) {
+                Log.e("client", "Cannot read data", e)
+            }
+        }
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
             if (!connectSuccess) {
-                Log.i("data", "couldn't connect")
+                Log.i("TESTTT", "couldn't connect")
             } else {
                 mIsConnected = true
             }
             mProgress.dismiss()
+            while(!Thread.currentThread().isInterrupted && mBluetoothSocket!=null && mIsConnected){
+                Log.d("Connect", "We are connected to bluetooth device.")
+                retrieveData(mBluetoothSocket!!)// retrieve data from module then do necessary thing
+            }
         }
     }
 }

@@ -46,8 +46,10 @@ class MainActivity : AppCompatActivity() {
             Log.d("Crash", "Bluetooth not supported on this device!")
             return
         }
-        mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
-        Bluetooth().start()
+        else {
+            mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
+            Bluetooth().start()
+        }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -55,6 +57,8 @@ class MainActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 if (mBluetoothAdapter.isEnabled) {
                     Toast.makeText(this, "Bluetooth has been enabled", Toast.LENGTH_SHORT).show()
+                    mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
+                    Bluetooth().start()
                 } else {
                     Toast.makeText(this, "Bluetooth has been disabled", Toast.LENGTH_SHORT).show()
 

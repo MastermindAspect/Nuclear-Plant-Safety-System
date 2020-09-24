@@ -77,8 +77,8 @@ fun clockOutEmployee(uId: String){
                 if (childEmployee != null) {
                     if (childEmployee.uid == uId){
                         val currentDateTime = LocalDateTime.now()
-                        val map = hashMapOf<String,String>()
-                        map[childEmployee.clockIn] = currentDateTime.format(DateTimeFormatter.ISO_DATE)
+                        val map = childEmployee.clockInOut
+                        map[childEmployee.clockIn] = currentDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                         databaseEmployeeRef.setValue(map)
                         it.ref.removeValue()
                     }
