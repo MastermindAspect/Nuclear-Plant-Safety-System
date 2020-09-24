@@ -10,6 +10,15 @@ import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
+import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.media.AudioAttributes
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.Build
 
 class MainActivity : AppCompatActivity() {
     companion object{
@@ -21,6 +30,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        //TODO("Pass user's id instead of static 123")
+        val notificationHandler = WarningNotificationHandler(123, this)
+        createNotificationChannel()
+        //User id here as well instead of 123
+        notificationHandler.listenForClockInEntry(123)
+
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if(!mBluetoothAdapter.isEnabled) {
             val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
@@ -44,8 +60,31 @@ class MainActivity : AppCompatActivity() {
 
                 }
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(this, "Bluetooth enabling has been canceled", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Bluetooth enabling has been canceled", Toast.LENGTH_SHORT)
+                    .show()
             }
+        }
+    }
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val descriptionText = getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val soundUri: Uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            val attributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .build()
+
+            val channel = NotificationChannel(5.toString(), name, importance).apply {
+                description = descriptionText
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                setSound(soundUri, attributes)
+                enableVibration(true)
+            }
+
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
     }
 }
