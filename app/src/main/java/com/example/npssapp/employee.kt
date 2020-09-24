@@ -55,10 +55,10 @@ fun isClockedIn(uId: String, callback: (result: Boolean) -> Unit){
                 val childEmployee = it.getValue(Employee::class.java)
                 if (childEmployee != null) {
                     val result = childEmployee.uid == uId
-                    callback(result)
+                    return callback(result)
                 }
             }
-            callback(false)
+            return callback(false)
         }
     })
 }
