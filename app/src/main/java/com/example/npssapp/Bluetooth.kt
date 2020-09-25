@@ -1,34 +1,21 @@
 package com.example.npssapp
 
-import android.os.Bundle
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import android.app.Activity
-import android.app.ProgressDialog
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import android.content.Intent
 import android.os.AsyncTask
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import com.example.npssapp.MainActivity.Companion.mProgress
-import kotlinx.coroutines.NonCancellable.start
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.*
-import java.util.Calendar.MILLISECOND
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class Bluetooth() : Thread() {
+class Bluetooth(context: Context) : Thread() {
 
     companion object {
         var mBluetoothSocket : BluetoothSocket? = null
@@ -36,17 +23,20 @@ class Bluetooth() : Thread() {
         var mIsConnected : Boolean = false
         const val mAddress : String ="98:D3:41:F9:76:43"
         val mUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
-
+        var c : Context? = null
     }
 
-
+    init {
+        c = context
+    }
 
     override fun run() {
         try {
-            ConnectToDevice().execute().get(10000, TimeUnit.MILLISECONDS)
+            ConnectToDevice().execute().get(8000, TimeUnit.MILLISECONDS)
         }
         catch(e: TimeoutException){
-            Log.e("Errors", "Timeout Error")
+            backgroundToast(c,"Bluetooth connection timed out!")
+            mProgress.dismiss()
         }
         while ((!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected)) {
             if (mBluetoothSocket != null){
@@ -142,4 +132,19 @@ class Bluetooth() : Thread() {
         }
     }
 
+}
+
+fun backgroundToast(
+    context: Context?,
+    msg: String?
+) {
+    if (context != null && msg != null) {
+        Handler(Looper.getMainLooper()).post(Runnable {
+            Toast.makeText(
+                context,
+                msg,
+                Toast.LENGTH_SHORT
+            ).show()
+        })
+    }
 }
