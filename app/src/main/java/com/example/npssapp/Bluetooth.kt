@@ -19,12 +19,14 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.npssapp.MainActivity.Companion.mProgress
 import kotlinx.coroutines.NonCancellable.start
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.*
 import java.util.Calendar.MILLISECOND
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class Bluetooth() : Thread() {
 
@@ -34,12 +36,18 @@ class Bluetooth() : Thread() {
         var mIsConnected : Boolean = false
         const val mAddress : String ="98:D3:41:F9:76:43"
         val mUUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+
     }
 
 
 
     override fun run() {
-        ConnectToDevice().execute().get(10000, TimeUnit.MILLISECONDS)
+        try {
+            ConnectToDevice().execute().get(10000, TimeUnit.MILLISECONDS)
+        }
+        catch(e: TimeoutException){
+            Log.e("Errors", "Timeout Error")
+        }
         while ((!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected)) {
             if (mBluetoothSocket != null){
                 retrieveData(mBluetoothSocket!!)
@@ -103,7 +111,9 @@ class Bluetooth() : Thread() {
     private class ConnectToDevice() : AsyncTask<Void, Void, String>() {
         private var connectSuccess: Boolean = true
 
+
         override fun doInBackground(vararg p0: Void?): String? {
+
             try {
                 if (mBluetoothSocket == null || !mIsConnected) {
                     mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
@@ -112,7 +122,8 @@ class Bluetooth() : Thread() {
                     BluetoothAdapter.getDefaultAdapter().cancelDiscovery()
                     mBluetoothSocket!!.connect()
                 }
-            } catch (e: IOException) {
+            }
+            catch (e: IOException) {
                 connectSuccess = false
                 e.printStackTrace()
             }
