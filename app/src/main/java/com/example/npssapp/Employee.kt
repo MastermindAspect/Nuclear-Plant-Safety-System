@@ -22,7 +22,7 @@ fun createNewEmployee(uId: String,title: String): Array<String> {
         outcome += "No title with that name."
         return outcome
     }
-    database.child("employees").child(employee.uid.toString()).setValue(employee)
+    database.child("employees").child(employee.uid).setValue(employee)
         .addOnFailureListener {
             outcome += "Could not write to database!"
         }
@@ -30,7 +30,7 @@ fun createNewEmployee(uId: String,title: String): Array<String> {
 }
 
 fun clockInEmployee(uId: String, title: String = "") {
-    val database = Firebase.database.reference.child("online").child(uId.toString())
+    val database = Firebase.database.reference.child("online").child(uId)
     var employeeTitle = title
     getEmployee(uId) {
         val currentDateTime = LocalDateTime.now()
@@ -48,6 +48,7 @@ fun isClockedIn(uId: String, callback: (result: Boolean) -> Unit){
     val databaseOnlineRef = Firebase.database.reference.child("online")
     databaseOnlineRef.addListenerForSingleValueEvent(object: ValueEventListener{
         override fun onCancelled(error: DatabaseError) {
+            Log.d("Error",error.toString())
         }
         override fun onDataChange(snapshot: DataSnapshot) {
             val employeeDetails = snapshot.children
@@ -69,6 +70,7 @@ fun clockOutEmployee(uId: String){
 
     databaseOnlineRef.addListenerForSingleValueEvent(object: ValueEventListener{
         override fun onCancelled(error: DatabaseError) {
+            Log.d("Error",error.toString())
         }
         override fun onDataChange(snapshot: DataSnapshot) {
             val employeeDetails = snapshot.children
@@ -93,6 +95,7 @@ fun getEmployee(uId: String, callback: (result: Employee?) -> Unit){
     val employees = database.child("employees")
     employees.addListenerForSingleValueEvent(object: ValueEventListener{
         override fun onCancelled(error: DatabaseError) {
+            Log.d("Error",error.toString())
         }
         override fun onDataChange(snapshot: DataSnapshot) {
             val employeeDetails = snapshot.children
