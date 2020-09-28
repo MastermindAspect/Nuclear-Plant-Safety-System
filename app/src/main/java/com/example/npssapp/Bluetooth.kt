@@ -85,7 +85,7 @@ class Bluetooth(context: Context) : Thread() {
         }
     }
 
-    private fun disconnect(){
+    public fun disconnect(){
         if (mBluetoothSocket != null) {
             try {
                 mBluetoothSocket!!.close()
@@ -124,8 +124,10 @@ class Bluetooth(context: Context) : Thread() {
             super.onPostExecute(result)
             if (!connectSuccess) {
                 Log.d("Connect", "couldn't connect")
+                backgroundToast(c,"Could not connect to device!")
             } else {
                 Log.d("Connect", "We are connected to bluetooth device.")
+                backgroundToast(c,"Connected!")
                 mIsConnected = true
             }
             mProgress.dismiss()

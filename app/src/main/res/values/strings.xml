@@ -5,4 +5,6 @@
     <string name="msg_token_fmt" />
     <string name="channel_name">radiation-limit</string>
     <string name="channel_description">Notifies the user when the radiation limit is about to be reached.</string>
+    <string name="home">Home</string>
+    <string name="connect">Connect</string>
 </resources>

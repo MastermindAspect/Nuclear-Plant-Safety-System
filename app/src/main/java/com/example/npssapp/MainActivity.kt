@@ -1,30 +1,26 @@
 package com.example.npssapp
 
-import android.app.Activity
-import android.app.ProgressDialog
+import android.app.*
 import android.bluetooth.BluetoothAdapter
-import android.content.Intent
-import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     companion object{
         lateinit var mBluetoothAdapter: BluetoothAdapter
         const val REQUEST_ENABLE_BLUETOOTH = 1
         lateinit var mProgress : ProgressDialog
+        var mBluetoothContext : Bluetooth? = null
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,10 +41,6 @@ class MainActivity : AppCompatActivity() {
         else if (mBluetoothAdapter == null) {
             Log.d("Crash", "Bluetooth not supported on this device!")
             return
-        }
-        else {
-            mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
-            Bluetooth(this).start()
         }
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -89,5 +81,32 @@ class MainActivity : AppCompatActivity() {
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.main,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            R.id.connect_safety_console -> {
+                if (!Bluetooth.mIsConnected){
+                    mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
+                    mBluetoothContext = Bluetooth(this)
+                    mBluetoothContext!!.start()
+                } else {
+                    mBluetoothContext?.disconnect()
+                    Toast.makeText(this, "Disconnected from Bluetooth!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            R.id.home -> {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
