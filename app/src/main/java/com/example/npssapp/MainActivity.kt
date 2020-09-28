@@ -21,18 +21,15 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_ENABLE_BLUETOOTH = 1
         lateinit var mProgress : ProgressDialog
         var mBluetoothContext : Bluetooth? = null
+        var currentUId : String? = null
+        var notificationHandler : WarningNotificationHandler? = null
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        //TODO("Pass user's id instead of static 123")
-        val notificationHandler = WarningNotificationHandler(123, this)
         createNotificationChannel()
-        //User id here as well instead of 123
-        notificationHandler.listenForClockInEntry(123)
-
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if(!mBluetoothAdapter.isEnabled) {
             val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)

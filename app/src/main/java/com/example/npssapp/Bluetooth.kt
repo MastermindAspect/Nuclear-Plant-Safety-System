@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
@@ -73,7 +74,12 @@ class Bluetooth(context: Context) : Thread() {
                     }
                     else {
                         clockInEmployee(uId)
+                        MainActivity.currentUId = uId
                         sendCommand("Success on logging in!")
+                        if (c != null) {
+                            val intent = Intent(c, Radiation::class.java)
+                            c!!.startActivity(intent)
+                        }
                     }
                 }
                 inputStream.reset()
@@ -85,7 +91,7 @@ class Bluetooth(context: Context) : Thread() {
         }
     }
 
-    public fun disconnect(){
+    fun disconnect(){
         if (mBluetoothSocket != null) {
             try {
                 mBluetoothSocket!!.close()
