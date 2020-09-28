@@ -103,6 +103,11 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
+            R.id.radiation -> {
+                val intent = Intent(this, Radiation::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

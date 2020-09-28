@@ -16,6 +16,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
+
 class Bluetooth(context: Context) : Thread() {
 
     companion object {

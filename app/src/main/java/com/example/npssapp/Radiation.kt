@@ -1,7 +1,11 @@
 package com.example.npssapp
 
+import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -79,5 +83,30 @@ class Radiation : AppCompatActivity() {
                 )
             }
         })
+    }
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item?.itemId){
+            R.id.connect_safety_console -> {
+                if (!Bluetooth.mIsConnected){
+                    MainActivity.mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
+                    MainActivity.mBluetoothContext = Bluetooth(this)
+                    MainActivity.mBluetoothContext!!.start()
+                } else {
+                    MainActivity.mBluetoothContext?.disconnect()
+                    Toast.makeText(this, "Disconnected from Bluetooth!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            R.id.home -> {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+            R.id.radiation -> {
+                val intent = Intent(this, Radiation::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
