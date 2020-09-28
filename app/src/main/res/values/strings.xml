@@ -9,4 +9,6 @@
     <string name="connect">Connect</string>
     <string name="title_activity_radiation">Radiation1</string>
     <string name="radiation">radiation</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

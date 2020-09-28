@@ -9,11 +9,17 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
     companion object{
@@ -21,8 +27,9 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_ENABLE_BLUETOOTH = 1
         lateinit var mProgress : ProgressDialog
         var mBluetoothContext : Bluetooth? = null
-        var currentUId : String? = null
+        var currentUId : String = ""
         var notificationHandler : WarningNotificationHandler? = null
+        var estimatedTimeLeft : Long = 0
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,9 +94,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+        when(item?.itemId) {
             R.id.connect_safety_console -> {
-                if (!Bluetooth.mIsConnected){
+                if (!Bluetooth.mIsConnected) {
                     mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
                     mBluetoothContext = Bluetooth(this)
                     mBluetoothContext!!.start()
@@ -103,12 +110,9 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
-            R.id.radiation -> {
-                val intent = Intent(this, Radiation::class.java)
-                startActivity(intent)
-                finish()
-            }
         }
         return super.onOptionsItemSelected(item)
     }
+
+
 }

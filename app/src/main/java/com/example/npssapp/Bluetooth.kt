@@ -6,11 +6,13 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.example.npssapp.MainActivity.Companion.mProgress
+import com.google.android.material.internal.ContextUtils.getActivity
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -71,16 +73,12 @@ class Bluetooth(context: Context) : Thread() {
                     if (it) {
                         clockOutEmployee(uId)
                         sendCommand("Success on logging out!")
-
                     }
                     else {
                         clockInEmployee(uId)
                         MainActivity.currentUId = uId
+                        MainActivity.notificationHandler = WarningNotificationHandler(uId,c!!)
                         sendCommand("Success on logging in!")
-                        if (c != null) {
-                            val intent = Intent(c, Radiation::class.java)
-                            c!!.startActivity(intent)
-                        }
                     }
                 }
                 inputStream.reset()

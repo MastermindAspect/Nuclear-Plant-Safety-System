@@ -8,8 +8,5 @@
     <item android:title="@string/connect"
             android:id="@+id/connect_safety_console"
             app:showAsAction="ifRoom" />
-    <item android:title="@string/radiation"
-            android:id="@+id/radiation"
-            app:showAsAction="ifRoom" />
 
 </menu>

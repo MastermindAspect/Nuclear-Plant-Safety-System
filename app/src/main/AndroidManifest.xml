@@ -19,10 +19,6 @@
         <meta-data
                 android:name="com.google.android.wearable.standalone"
                 android:value="true" />
-
-        <activity
-                android:name=".Radiation"
-                android:label="@string/title_activity_radiation" />
         <activity
                 android:name=".MainActivity"
                 android:label="@string/title_activity_main"
