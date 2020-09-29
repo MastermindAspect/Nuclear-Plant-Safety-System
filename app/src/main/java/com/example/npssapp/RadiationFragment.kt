@@ -30,7 +30,6 @@ class RadiationFragment : Fragment() {
         val handler = Handler()
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         runnable = Runnable{
@@ -43,7 +42,6 @@ class RadiationFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_radiation, container, false)
     }
-
 
     fun estimatedTimeRemaining() : Long {
         val estimatedTimeRemain = maxExposure / this.radiationPerSecond()
@@ -68,6 +66,7 @@ class RadiationFragment : Fragment() {
             object : CountDownTimer(estimatedTimeRemaining()*1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     if (!timerRunning) {
+                        countTime.text = ""
                         this.cancel()
                     }
                     countTime.text = "Reaching maximum exposure in: $counter"
