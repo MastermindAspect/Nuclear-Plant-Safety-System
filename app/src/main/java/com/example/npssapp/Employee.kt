@@ -83,6 +83,8 @@ fun clockOutEmployee(uId: String){
                         map[childEmployee.clockIn] = currentDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                         databaseEmployeeRef.setValue(map)
                         it.ref.removeValue()
+                        MainActivity.currentUId = ""
+                        RadiationFragment.timerRunning = false
                     }
                 }
             }

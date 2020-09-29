@@ -20,12 +20,12 @@ import kotlinx.android.synthetic.main.fragment_radiation.*
 
 class RadiationFragment : Fragment() {
     companion object{
-        private var reactorRadiation:Int = 100000
+        private var reactorRadiation:Int = 99000
         private var roomCoefficient : Double = 1.6
         private var protectiveCoefficient : Int = 5
         private const val maxExposure : Int = 500000
         private var totalRadiationExposure: Double = 0.0
-        private var timerRunning : Boolean = false
+        var timerRunning : Boolean = false
         private var runnable : Runnable = Runnable {}
         val handler = Handler()
     }
@@ -61,11 +61,10 @@ class RadiationFragment : Fragment() {
         else {
             val countTime = estimatedTimeRemainingText
             var counter = estimatedTimeRemaining()
-            val q = LongArray(4)
-            q[0] = counter/2
-            q[1] = counter/4
-            q[2] = counter/6
-            q[3] = counter/8
+            val q = LongArray(3)
+            q[0] = counter/2 + counter/4
+            q[1] = counter/2
+            q[2] = counter/2 - counter/4
             object : CountDownTimer(estimatedTimeRemaining()*1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     countTime.text = "Reaching maximum exposure in: $counter"
@@ -74,6 +73,12 @@ class RadiationFragment : Fragment() {
                         try {
                             MainActivity.notificationHandler!!.sendRadiationNotification()
                             MainActivity.notificationHandler!!.wakePhoneScreen()
+                            try {
+                                MainActivity.mBluetoothContext!!.sendCommand("n")
+                            }
+                            catch (e: KotlinNullPointerException){
+                                Toast.makeText(activity, "Error! Could not send message over Bluetooth!", Toast.LENGTH_SHORT).show()
+                            }
                         }
                         catch (e: KotlinNullPointerException){
                             Toast.makeText(activity, "Error! Could not send notification!", Toast.LENGTH_SHORT).show()
@@ -86,6 +91,7 @@ class RadiationFragment : Fragment() {
                         MainActivity.notificationHandler!!.wakePhoneScreen()
                         try {
                             MainActivity.mBluetoothContext!!.sendCommand("r")
+                            countTime.text = "Leave the area, NOW!"
                         }
                         catch (e: KotlinNullPointerException){
                             Toast.makeText(activity, "Error! Could not send message over Bluetooth!", Toast.LENGTH_SHORT).show()
