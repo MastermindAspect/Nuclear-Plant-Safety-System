@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
         var mBluetoothContext : Bluetooth? = null
         var currentUId : String = ""
         var notificationHandler : WarningNotificationHandler? = null
-        var estimatedTimeLeft : Long = 0
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,13 +95,19 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when(item?.itemId) {
             R.id.connect_safety_console -> {
-                if (!Bluetooth.mIsConnected) {
+                if (mBluetoothContext == null) {
                     mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
                     mBluetoothContext = Bluetooth(this)
                     mBluetoothContext!!.start()
                 } else {
-                    mBluetoothContext?.disconnect()
-                    Toast.makeText(this, "Disconnected from Bluetooth!", Toast.LENGTH_SHORT).show()
+                    if (!mBluetoothContext!!.getConnected()) {
+                        mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
+                        mBluetoothContext = Bluetooth(this)
+                        mBluetoothContext!!.start()
+                    } else {
+                        mBluetoothContext?.disconnect()
+                        Toast.makeText(this, "Disconnected from Bluetooth!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             R.id.home -> {
@@ -114,5 +119,8 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-
+    /*override fun onDestroy() {
+        super.onDestroy()
+        clockOutEmployee(currentUId)
+    }*/
 }

@@ -34,6 +34,10 @@ class Bluetooth(context: Context) : Thread() {
         c = context
     }
 
+    fun getConnected() : Boolean{
+        return mIsConnected
+    }
+
     override fun run() {
         try {
             ConnectToDevice().execute().get(8000, TimeUnit.MILLISECONDS)
@@ -42,10 +46,8 @@ class Bluetooth(context: Context) : Thread() {
             backgroundToast(c,"Bluetooth connection timed out!")
             mProgress.dismiss()
         }
-        while ((!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected)) {
-            if (mBluetoothSocket != null){
-                retrieveData(mBluetoothSocket!!)
-            }
+        while (!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected) {
+            retrieveData(mBluetoothSocket!!)
             isClockedIn("asd123") {
                 Log.d("TESTTT", it.toString())
             }
@@ -81,10 +83,7 @@ class Bluetooth(context: Context) : Thread() {
                         sendCommand("Success on logging in!")
                     }
                 }
-                inputStream.reset()
             }
-
-
         } catch (e: IOException) {
             Log.e("client", "Cannot read data", e)
         }
@@ -95,8 +94,10 @@ class Bluetooth(context: Context) : Thread() {
             try {
                 mBluetoothSocket!!.close()
                 mBluetoothSocket!!.inputStream.close()
+                mBluetoothSocket!!.outputStream.close()
                 mBluetoothSocket = null
                 MainActivity.mBluetoothContext = null
+                MainActivity.currentUId = ""
                 mIsConnected = false
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -106,7 +107,6 @@ class Bluetooth(context: Context) : Thread() {
 
     private class ConnectToDevice() : AsyncTask<Void, Void, String>() {
         private var connectSuccess: Boolean = true
-
 
         override fun doInBackground(vararg p0: Void?): String? {
 
@@ -132,9 +132,10 @@ class Bluetooth(context: Context) : Thread() {
                 Log.d("Connect", "couldn't connect")
                 backgroundToast(c,"Could not connect to device!")
             } else {
+                mIsConnected = true
                 Log.d("Connect", "We are connected to bluetooth device.")
                 backgroundToast(c,"Connected!")
-                mIsConnected = true
+
             }
             mProgress.dismiss()
         }
