@@ -53,7 +53,38 @@ void loop() {
 
   //Write data from HC06 to Serial Monitor
   if (hc06.available()) {
-    Serial.write(hc06.read());
+    // Serial.write(hc06.read());
+    int receivedMsg = hc06.read();
+    Serial.print(receivedMsg);
+    Serial.println();
+    switch(receivedMsg) {
+      case 'r': 
+        // System wide warning
+        lcd.clear();
+        lcd.print("Get out!");
+        lcd.setCursor(0,1);
+        lcd.print("It's hot!");
+        break;
+      case 'i': 
+        // Check in
+        lcd.clear();
+        lcd.print("Checked in");
+        break;
+      case 'o': 
+        // Check out
+        lcd.clear();
+        lcd.print("Checked out");
+        break;
+      case 'n': 
+        // Interval warning
+        lcd.clear();
+        lcd.print("Reminder warning");
+        break;
+      default:
+        lcd.clear();
+        lcd.print("inside default");
+        break;
+    }
   }
 
   //Write from Serial Monitor to HC06
@@ -72,7 +103,7 @@ void loop() {
   for (byte i = 0; i < mfrc522.uid.size; i++) {
     uid += String(mfrc522.uid.uidByte[i], HEX);
   }
-  if (uid == "d9a7dd56") {
+  /*if (uid == "d9a7dd56") {
     if (isLoggedIn) {
       // Reseting timer so it wont be printed
       timer = 0;
@@ -88,13 +119,7 @@ void loop() {
       lcd.clear();
       lcd.print("Checked in");
     }
-  }
-  Serial.println("millis: ");
-  Serial.print(millis());
-  Serial.println();
-  Serial.println("timer: ");
-  Serial.print(timer);
-  Serial.println();
+  }*/
   Serial.print(uid);
   Serial.println();
   hc06.print(uid);
