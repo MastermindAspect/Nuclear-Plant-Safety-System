@@ -67,6 +67,9 @@ class RadiationFragment : Fragment() {
             q[2] = counter/2 - counter/4
             object : CountDownTimer(estimatedTimeRemaining()*1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
+                    if (!timerRunning) {
+                        this.cancel()
+                    }
                     countTime.text = "Reaching maximum exposure in: $counter"
                     counter--
                     if (counter in q){
