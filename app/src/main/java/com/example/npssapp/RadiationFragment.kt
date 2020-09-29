@@ -61,15 +61,35 @@ class RadiationFragment : Fragment() {
         else {
             val countTime = estimatedTimeRemainingText
             var counter = estimatedTimeRemaining()
+            val q = LongArray(4)
+            q[0] = counter/2
+            q[1] = counter/4
+            q[2] = counter/6
+            q[3] = counter/8
             object : CountDownTimer(estimatedTimeRemaining()*1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     countTime.text = "Reaching maximum exposure in: $counter"
                     counter--
+                    if (counter in q){
+                        try {
+                            MainActivity.notificationHandler!!.sendRadiationNotification()
+                            MainActivity.notificationHandler!!.wakePhoneScreen()
+                        }
+                        catch (e: KotlinNullPointerException){
+                            Toast.makeText(activity, "Error! Could not send notification!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
                 override fun onFinish() {
                     try {
                         MainActivity.notificationHandler!!.sendRadiationNotification()
                         MainActivity.notificationHandler!!.wakePhoneScreen()
+                        try {
+                            MainActivity.mBluetoothContext!!.sendCommand("r")
+                        }
+                        catch (e: KotlinNullPointerException){
+                            Toast.makeText(activity, "Error! Could not send message over Bluetooth!", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     catch (e: KotlinNullPointerException){
                         Toast.makeText(activity, "Error! Could not send notification!", Toast.LENGTH_SHORT).show()

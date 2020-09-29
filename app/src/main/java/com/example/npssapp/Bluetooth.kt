@@ -52,7 +52,7 @@ class Bluetooth(context: Context) : Thread() {
         }
 
     }
-    private fun sendCommand(input: String){
+    fun sendCommand(input: String){
         if (mBluetoothSocket != null) {
             try{
                 mBluetoothSocket!!.outputStream.write(input.toByteArray())
@@ -96,6 +96,7 @@ class Bluetooth(context: Context) : Thread() {
                 mBluetoothSocket!!.close()
                 mBluetoothSocket!!.inputStream.close()
                 mBluetoothSocket = null
+                MainActivity.mBluetoothContext = null
                 mIsConnected = false
             } catch (e: IOException) {
                 e.printStackTrace()
