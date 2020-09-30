@@ -4,16 +4,20 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
+import android.content.Intent
 import android.os.AsyncTask
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.example.npssapp.MainActivity.Companion.mProgress
+import com.google.android.material.internal.ContextUtils.getActivity
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+
 
 class Bluetooth(context: Context) : Thread() {
 
@@ -30,6 +34,10 @@ class Bluetooth(context: Context) : Thread() {
         c = context
     }
 
+    fun getConnected() : Boolean{
+        return mIsConnected
+    }
+
     override fun run() {
         try {
             ConnectToDevice().execute().get(8000, TimeUnit.MILLISECONDS)
@@ -38,17 +46,15 @@ class Bluetooth(context: Context) : Thread() {
             backgroundToast(c,"Bluetooth connection timed out!")
             mProgress.dismiss()
         }
-        while ((!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected)) {
-            if (mBluetoothSocket != null){
-                retrieveData(mBluetoothSocket!!)
-            }
+        while (!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected) {
+            retrieveData(mBluetoothSocket!!)
             isClockedIn("asd123") {
                 Log.d("TESTTT", it.toString())
             }
         }
 
     }
-    private fun sendCommand(input: String){
+    fun sendCommand(input: String){
         if (mBluetoothSocket != null) {
             try{
                 mBluetoothSocket!!.outputStream.write(input.toByteArray())
@@ -69,28 +75,29 @@ class Bluetooth(context: Context) : Thread() {
                     if (it) {
                         clockOutEmployee(uId)
                         sendCommand("Success on logging out!")
-
                     }
                     else {
                         clockInEmployee(uId)
+                        MainActivity.currentUId = uId
+                        MainActivity.notificationHandler = WarningNotificationHandler(uId,c!!)
                         sendCommand("Success on logging in!")
                     }
                 }
-                inputStream.reset()
             }
-
-
         } catch (e: IOException) {
             Log.e("client", "Cannot read data", e)
         }
     }
 
-    public fun disconnect(){
+    fun disconnect(){
         if (mBluetoothSocket != null) {
             try {
                 mBluetoothSocket!!.close()
                 mBluetoothSocket!!.inputStream.close()
+                mBluetoothSocket!!.outputStream.close()
                 mBluetoothSocket = null
+                MainActivity.mBluetoothContext = null
+                MainActivity.currentUId = ""
                 mIsConnected = false
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -100,7 +107,6 @@ class Bluetooth(context: Context) : Thread() {
 
     private class ConnectToDevice() : AsyncTask<Void, Void, String>() {
         private var connectSuccess: Boolean = true
-
 
         override fun doInBackground(vararg p0: Void?): String? {
 
@@ -126,9 +132,10 @@ class Bluetooth(context: Context) : Thread() {
                 Log.d("Connect", "couldn't connect")
                 backgroundToast(c,"Could not connect to device!")
             } else {
+                mIsConnected = true
                 Log.d("Connect", "We are connected to bluetooth device.")
                 backgroundToast(c,"Connected!")
-                mIsConnected = true
+
             }
             mProgress.dismiss()
         }

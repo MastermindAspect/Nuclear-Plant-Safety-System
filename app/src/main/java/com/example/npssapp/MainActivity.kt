@@ -9,11 +9,17 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
     companion object{
@@ -21,18 +27,15 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_ENABLE_BLUETOOTH = 1
         lateinit var mProgress : ProgressDialog
         var mBluetoothContext : Bluetooth? = null
+        var currentUId : String = ""
+        var notificationHandler : WarningNotificationHandler? = null
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        //TODO("Pass user's id instead of static 123")
-        val notificationHandler = WarningNotificationHandler(123, this)
         createNotificationChannel()
-        //User id here as well instead of 123
-        notificationHandler.listenForClockInEntry(123)
-
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if(!mBluetoothAdapter.isEnabled) {
             val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
@@ -90,15 +93,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+        when(item?.itemId) {
             R.id.connect_safety_console -> {
-                if (!Bluetooth.mIsConnected){
+                if (mBluetoothContext == null) {
                     mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
                     mBluetoothContext = Bluetooth(this)
                     mBluetoothContext!!.start()
                 } else {
-                    mBluetoothContext?.disconnect()
-                    Toast.makeText(this, "Disconnected from Bluetooth!", Toast.LENGTH_SHORT).show()
+                    if (!mBluetoothContext!!.getConnected()) {
+                        mProgress = ProgressDialog.show(this, "Connecting...", "please wait")
+                        mBluetoothContext = Bluetooth(this)
+                        mBluetoothContext!!.start()
+                    } else {
+                        mBluetoothContext?.disconnect()
+                        Toast.makeText(this, "Disconnected from Bluetooth!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             R.id.home -> {
@@ -109,4 +118,9 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    /*override fun onDestroy() {
+        super.onDestroy()
+        clockOutEmployee(currentUId)
+    }*/
 }
