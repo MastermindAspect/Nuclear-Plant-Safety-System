@@ -14,6 +14,8 @@ import android.widget.Toast
 import com.example.npssapp.MainActivity.Companion.mProgress
 import com.google.android.material.internal.ContextUtils.getActivity
 import java.io.IOException
+import java.lang.Integer.max
+import java.lang.Integer.min
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -69,19 +71,31 @@ class Bluetooth(context: Context) : Thread() {
             val available = inputStream.available()
             val bytes = ByteArray(available)
             inputStream.read(bytes, 0, available)
-            val uId = String(bytes)
-            if (uId.length >= 8 ) {
-                isClockedIn(uId) {
-                    if (it) {
-                        clockOutEmployee(uId)
-                        sendCommand("Success on logging out!")
+            val message = String(bytes)
+            val arr = message.split(":").toTypedArray()
+            when (arr[0]){
+                "uid" -> {
+                    if (arr[1].length >= 8 ) {
+                        isClockedIn(arr[1]) {
+                            if (it) {
+                                clockOutEmployee(arr[1])
+                                sendCommand("Success on logging out!")
+                            }
+                            else {
+                                clockInEmployee(arr[1])
+                                MainActivity.currentUId = arr[1]
+                                MainActivity.notificationHandler = WarningNotificationHandler(arr[1],c!!)
+                                sendCommand("Success on logging in!")
+                            }
+                        }
                     }
-                    else {
-                        clockInEmployee(uId)
-                        MainActivity.currentUId = uId
-                        MainActivity.notificationHandler = WarningNotificationHandler(uId,c!!)
-                        sendCommand("Success on logging in!")
-                    }
+                }
+                "r" -> {
+                    RadiationFragment.reactorRadiation = min(100,max(1,arr[1].toInt()))
+                }
+                "s" -> {
+                    if (arr[1] == "true") RadiationFragment.isWearingHazmat = true
+                    else RadiationFragment.isWearingHazmat = false
                 }
             }
         } catch (e: IOException) {

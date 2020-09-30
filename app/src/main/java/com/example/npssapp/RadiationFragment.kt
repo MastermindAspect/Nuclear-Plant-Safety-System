@@ -20,11 +20,11 @@ import kotlinx.android.synthetic.main.fragment_radiation.*
 
 class RadiationFragment : Fragment() {
     companion object{
-        private var reactorRadiation:Int = 99000
+        var reactorRadiation:Int = 30
         private var roomCoefficient : Double = 1.6
-        private var protectiveCoefficient : Int = 5
+        private var protectiveCoefficient : Int = 1
         private const val maxExposure : Int = 500000
-        var isWearingHazman : Boolean = false
+        var isWearingHazmat : Boolean = false
         private var totalRadiationExposure: Double = 0.0
         var timerRunning : Boolean = false
         private var runnable : Runnable = Runnable {}
@@ -45,6 +45,8 @@ class RadiationFragment : Fragment() {
     }
 
     fun estimatedTimeRemaining() : Long {
+        protectiveCoefficient = if (isWearingHazmat) 5
+        else 1
         val estimatedTimeRemain = maxExposure / this.radiationPerSecond()
         return estimatedTimeRemain.toLong()
     }
@@ -59,19 +61,21 @@ class RadiationFragment : Fragment() {
         }
         else {
             val countTime = estimatedTimeRemainingText
-            var counter = estimatedTimeRemaining()
-            val q = LongArray(3)
-            q[0] = counter/2 + counter/4
-            q[1] = counter/2
-            q[2] = counter/2 - counter/4
-            object : CountDownTimer(estimatedTimeRemaining()*1000, 1000) {
+            var secondsPassed : Long = 0
+            object : CountDownTimer((estimatedTimeRemaining()*1000)-secondsPassed*1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
+                    var counter = estimatedTimeRemaining() - secondsPassed
+                    val q = LongArray(3)
+                    q[0] = counter/2 + counter/4
+                    q[1] = counter/2
+                    q[2] = counter/2 - counter/4
                     if (!timerRunning) {
                         countTime.text = ""
                         this.cancel()
                     }
                     countTime.text = "Reaching maximum exposure in: $counter"
                     counter--
+                    secondsPassed++
                     if (counter in q){
                         try {
                             MainActivity.notificationHandler!!.sendRadiationNotification()
@@ -112,13 +116,10 @@ class RadiationFragment : Fragment() {
 
         databaseOnlineRef.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
             }
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
             }
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
