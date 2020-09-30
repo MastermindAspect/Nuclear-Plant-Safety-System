@@ -24,6 +24,7 @@ class RadiationFragment : Fragment() {
         private var roomCoefficient : Double = 1.6
         private var protectiveCoefficient : Int = 5
         private const val maxExposure : Int = 500000
+        var isWearingHazman : Boolean = false
         private var totalRadiationExposure: Double = 0.0
         var timerRunning : Boolean = false
         private var runnable : Runnable = Runnable {}
