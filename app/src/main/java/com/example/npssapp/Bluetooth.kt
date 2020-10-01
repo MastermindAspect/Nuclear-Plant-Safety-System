@@ -4,15 +4,12 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import android.content.Intent
 import android.os.AsyncTask
-import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.example.npssapp.MainActivity.Companion.mProgress
-import com.google.android.material.internal.ContextUtils.getActivity
 import java.io.IOException
 import java.lang.Integer.max
 import java.lang.Integer.min
@@ -44,8 +41,8 @@ class Bluetooth(context: Context) : Thread() {
         try {
             ConnectToDevice().execute().get(8000, TimeUnit.MILLISECONDS)
         }
-        catch(e: TimeoutException){
-            backgroundToast(c,"Bluetooth connection timed out!")
+        catch (e: TimeoutException){
+            backgroundToast(c, "Bluetooth connection timed out!")
             mProgress.dismiss()
         }
         while (!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected) {
@@ -60,7 +57,7 @@ class Bluetooth(context: Context) : Thread() {
         if (mBluetoothSocket != null) {
             try{
                 mBluetoothSocket!!.outputStream.write(input.toByteArray())
-            } catch(e: IOException) {
+            } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
@@ -69,25 +66,27 @@ class Bluetooth(context: Context) : Thread() {
         val inputStream = socket.inputStream
         try {
             val available = inputStream.available()
-            val bytes = ByteArray(available)
+            var bytes = ByteArray(available)
             inputStream.read(bytes, 0, available)
             val message = String(bytes)
             val arr = message.split(":").toTypedArray()
+            message.replace("#","")
             if (message.length > 2){
                 Log.d("Oscar", "${arr[0]} ${arr[1]}")
                 when (arr[0]){
-
                     "uid" -> {
-                        if (arr[1].length == 8 ) {
+                        if (arr[1].length == 8) {
                             isClockedIn(arr[1]) {
                                 if (it) {
                                     clockOutEmployee(arr[1])
                                     sendCommand("o")
-                                }
-                                else {
+                                } else {
                                     clockInEmployee(arr[1])
                                     MainActivity.currentUId = arr[1]
-                                    MainActivity.notificationHandler = WarningNotificationHandler(arr[1],c!!)
+                                    MainActivity.notificationHandler = WarningNotificationHandler(
+                                        arr[1],
+                                        c!!
+                                    )
                                     sendCommand("i")
                                 }
                             }
@@ -95,7 +94,7 @@ class Bluetooth(context: Context) : Thread() {
                     }
                     "r" -> {
                         // Log.d("Oscar", "${arr[1]}")
-                        RadiationFragment.reactorRadiation = min(100,max(1,arr[1].toInt()))
+                        RadiationFragment.reactorRadiation = min(100, max(1, arr[1].toInt()))
                     }
                     "s" -> {
                         // Log.d("Oscar", "${arr[1]}")
@@ -150,11 +149,11 @@ class Bluetooth(context: Context) : Thread() {
             super.onPostExecute(result)
             if (!connectSuccess) {
                 Log.d("Connect", "couldn't connect")
-                backgroundToast(c,"Could not connect to device!")
+                backgroundToast(c, "Could not connect to device!")
             } else {
                 mIsConnected = true
                 Log.d("Connect", "We are connected to bluetooth device.")
-                backgroundToast(c,"Connected!")
+                backgroundToast(c, "Connected!")
 
             }
             mProgress.dismiss()
