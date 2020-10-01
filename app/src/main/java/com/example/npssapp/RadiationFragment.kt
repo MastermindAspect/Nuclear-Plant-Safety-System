@@ -73,9 +73,17 @@ class RadiationFragment : Fragment() {
                         countTime.text = " "
                         this.cancel()
                     }
+
                     countTime.text = "Reaching maximum exposure in: $counter"
                     counter--
                     secondsPassed++
+                    try {
+                        MainActivity.mBluetoothContext!!.sendCommand("t:${counter.toInt()}")
+                    }
+                    catch (e: KotlinNullPointerException){
+                        Toast.makeText(activity, "Error! Could not send message over Bluetooth!", Toast.LENGTH_SHORT).show()
+                    }
+
                     if (counter in q){
                         try {
                             MainActivity.notificationHandler!!.sendRadiationNotification()
