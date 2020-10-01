@@ -68,9 +68,8 @@ class Bluetooth(context: Context) : Thread() {
             val available = inputStream.available()
             var bytes = ByteArray(available)
             inputStream.read(bytes, 0, available)
-            val message = String(bytes)
+            val message = String(bytes).replace("#","")
             val arr = message.split(":").toTypedArray()
-            message.replace("#","")
             if (message.length > 2){
                 Log.d("Oscar", "${arr[0]} ${arr[1]}")
                 when (arr[0]){
