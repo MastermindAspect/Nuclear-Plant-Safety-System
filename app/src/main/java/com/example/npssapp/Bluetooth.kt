@@ -73,29 +73,31 @@ class Bluetooth(context: Context) : Thread() {
             inputStream.read(bytes, 0, available)
             val message = String(bytes)
             val arr = message.split(":").toTypedArray()
-            when (arr[0]){
-                "uid" -> {
-                    if (arr[1].length >= 8 ) {
-                        isClockedIn(arr[1]) {
-                            if (it) {
-                                clockOutEmployee(arr[1])
-                                sendCommand("Success on logging out!")
-                            }
-                            else {
-                                clockInEmployee(arr[1])
-                                MainActivity.currentUId = arr[1]
-                                MainActivity.notificationHandler = WarningNotificationHandler(arr[1],c!!)
-                                sendCommand("Success on logging in!")
+            if (message.length > 2){
+                when (arr[0]){
+                    "uid" -> {
+                        if (arr[1].length == 8 ) {
+                            isClockedIn(arr[1]) {
+                                if (it) {
+                                    clockOutEmployee(arr[1])
+                                    sendCommand("Success on logging out!")
+                                }
+                                else {
+                                    clockInEmployee(arr[1])
+                                    MainActivity.currentUId = arr[1]
+                                    MainActivity.notificationHandler = WarningNotificationHandler(arr[1],c!!)
+                                    sendCommand("Success on logging in!")
+                                }
                             }
                         }
                     }
-                }
-                "r" -> {
-                    RadiationFragment.reactorRadiation = min(100,max(1,arr[1].toInt()))
-                }
-                "s" -> {
-                    if (arr[1] == "true") RadiationFragment.isWearingHazmat = true
-                    else RadiationFragment.isWearingHazmat = false
+                    "r" -> {
+                        RadiationFragment.reactorRadiation = min(100,max(1,arr[1].toInt()))
+                    }
+                    "s" -> {
+                        if (arr[1] == "true") RadiationFragment.isWearingHazmat = true
+                        else RadiationFragment.isWearingHazmat = false
+                    }
                 }
             }
         } catch (e: IOException) {
