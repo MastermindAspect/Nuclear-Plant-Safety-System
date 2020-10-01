@@ -74,27 +74,31 @@ class Bluetooth(context: Context) : Thread() {
             val message = String(bytes)
             val arr = message.split(":").toTypedArray()
             if (message.length > 2){
+                Log.d("Oscar", "${arr[0]} ${arr[1]}")
                 when (arr[0]){
+
                     "uid" -> {
                         if (arr[1].length == 8 ) {
                             isClockedIn(arr[1]) {
                                 if (it) {
                                     clockOutEmployee(arr[1])
-                                    sendCommand("Success on logging out!")
+                                    sendCommand("o")
                                 }
                                 else {
                                     clockInEmployee(arr[1])
                                     MainActivity.currentUId = arr[1]
                                     MainActivity.notificationHandler = WarningNotificationHandler(arr[1],c!!)
-                                    sendCommand("Success on logging in!")
+                                    sendCommand("i")
                                 }
                             }
                         }
                     }
                     "r" -> {
+                        // Log.d("Oscar", "${arr[1]}")
                         RadiationFragment.reactorRadiation = min(100,max(1,arr[1].toInt()))
                     }
                     "s" -> {
+                        // Log.d("Oscar", "${arr[1]}")
                         if (arr[1] == "true") RadiationFragment.isWearingHazmat = true
                         else RadiationFragment.isWearingHazmat = false
                     }

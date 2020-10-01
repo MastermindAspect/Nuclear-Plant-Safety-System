@@ -70,7 +70,7 @@ class RadiationFragment : Fragment() {
                     q[1] = counter/2
                     q[2] = counter/2 - counter/4
                     if (!timerRunning) {
-                        countTime.text = ""
+                        countTime.text = " "
                         this.cancel()
                     }
                     countTime.text = "Reaching maximum exposure in: $counter"
