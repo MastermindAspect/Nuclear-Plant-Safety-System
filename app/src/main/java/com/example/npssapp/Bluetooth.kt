@@ -13,6 +13,7 @@ import com.example.npssapp.MainActivity.Companion.mProgress
 import java.io.IOException
 import java.lang.Integer.max
 import java.lang.Integer.min
+import java.lang.NumberFormatException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -68,12 +69,12 @@ class Bluetooth(context: Context) : Thread() {
             val available = inputStream.available()
             var bytes = ByteArray(available)
             inputStream.read(bytes, 0, available)
-            val message = String(bytes).replace("#","")
+            val message = String(bytes)
             val arr = message.split(":").toTypedArray()
             if (message.length > 2){
                 Log.d("Oscar", "${arr[0]} ${arr[1]}")
                 when (arr[0]){
-                    "uid" -> {
+                    "u" -> {
                         if (arr[1].length == 8) {
                             isClockedIn(arr[1]) {
                                 if (it) {
@@ -93,7 +94,12 @@ class Bluetooth(context: Context) : Thread() {
                     }
                     "r" -> {
                         // Log.d("Oscar", "${arr[1]}")
-                        RadiationFragment.reactorRadiation = min(100, max(1, arr[1].toInt()))
+                        try{
+                            RadiationFragment.reactorRadiation = min(100, max(1, arr[1].toInt()))
+                        }
+                        catch (e: NumberFormatException){
+                            Log.e("Error", "Could not format string!")
+                        }
                     }
                     "s" -> {
                         // Log.d("Oscar", "${arr[1]}")
