@@ -62,13 +62,17 @@ class RadiationFragment : Fragment() {
         else {
             val countTime = estimatedTimeRemainingText
             var secondsPassed : Long = 0
+            val q = LongArray(3)
+            var tempEstimated : Long = 0
             object : CountDownTimer((estimatedTimeRemaining()*1000)-secondsPassed*1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     var counter = estimatedTimeRemaining() - secondsPassed
-                    val q = LongArray(3)
-                    q[0] = counter/2 + counter/4
-                    q[1] = counter/2
-                    q[2] = counter/2 - counter/4
+                    if (tempEstimated != estimatedTimeRemaining()){
+                        q[0] = counter/2 + counter/4
+                        q[1] = counter/2
+                        q[2] = counter/2 - counter/4
+                        tempEstimated = estimatedTimeRemaining()
+                    }
                     if (!timerRunning) {
                         countTime.text = " "
                         this.cancel()

@@ -62,6 +62,7 @@ class Bluetooth(context: Context) : Thread() {
                 e.printStackTrace()
             }
         }
+        mBluetoothSocket!!.outputStream.flush()
     }
     private fun retrieveData(socket: BluetoothSocket){
         val inputStream = socket.inputStream
