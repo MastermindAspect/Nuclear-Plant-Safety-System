@@ -104,8 +104,14 @@ class Bluetooth(context: Context) : Thread() {
                     }
                     "s" -> {
                         // Log.d("Oscar", "${arr[1]}")
-                        if (arr[1] == "true") RadiationFragment.isWearingHazmat = true
-                        else RadiationFragment.isWearingHazmat = false
+                        if (arr[1] == "true") {
+                            RadiationFragment.isWearingHazmat = true
+                            this.sendCommand("h:1")
+                        }
+                        else {
+                            RadiationFragment.isWearingHazmat = false
+                            this.sendCommand("h:0")
+                        }
                     }
                 }
             }
