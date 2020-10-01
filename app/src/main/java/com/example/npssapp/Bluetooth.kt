@@ -106,11 +106,11 @@ class Bluetooth(context: Context) : Thread() {
                         // Log.d("Oscar", "${arr[1]}")
                         if (arr[1] == "true") {
                             RadiationFragment.isWearingHazmat = true
-                            this.sendCommand("h:1")
+                            this.sendCommand("t:hazmat ON")
                         }
                         else {
                             RadiationFragment.isWearingHazmat = false
-                            this.sendCommand("h:0")
+                            this.sendCommand("h:hazmat OFF")
                         }
                     }
                 }
