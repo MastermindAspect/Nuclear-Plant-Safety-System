@@ -104,18 +104,14 @@ class Bluetooth(context: Context) : Thread() {
                     }
                     "s" -> {
                         // Log.d("Oscar", "${arr[1]}")
-                        if (arr[1] == "true") {
-                            RadiationFragment.isWearingHazmat = true
-                            //sendCommand("t:hazmat ON")
-                        }
-                        else {
-                            RadiationFragment.isWearingHazmat = false
-                            //sendCommand("h:hazmat OFF")
-                        }
+                        RadiationFragment.isWearingHazmat = arr[1] == "true"
                     }
                     "y" -> {
                         try{
-                            RadiationFragment.roomCoefficient = arr[1].toDouble()
+                            RadiationFragment.roomIndex++
+                            if(RadiationFragment.roomIndex > 3){
+                                RadiationFragment.roomIndex = 0
+                            }
                         }
                         catch (e: NumberFormatException){
                             Log.e("Error", "Could not format string!")
