@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.fragment_radiation.*
 class RadiationFragment : Fragment() {
     companion object{
         var reactorRadiation:Int = 30
-        private var roomCoefficient : Double = 1.6
+        var roomCoefficient : Double = 1.6
         private var protectiveCoefficient : Int = 1
         private const val maxExposure : Int = 500000
         var isWearingHazmat : Boolean = false
