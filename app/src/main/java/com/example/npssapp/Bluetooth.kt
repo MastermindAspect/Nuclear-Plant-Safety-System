@@ -112,6 +112,7 @@ class Bluetooth(context: Context) : Thread() {
                             if(RadiationFragment.roomIndex > 2){
                                 RadiationFragment.roomIndex = 0
                             }
+                            sendCommand("${RadiationFragment.roomIndex+1}")
                         }
                         catch (e: NumberFormatException){
                             Log.e("Error", "Could not format string!")
