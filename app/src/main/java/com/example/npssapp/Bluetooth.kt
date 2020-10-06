@@ -4,16 +4,16 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import android.content.Intent
 import android.os.AsyncTask
-import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.example.npssapp.MainActivity.Companion.mProgress
-import com.google.android.material.internal.ContextUtils.getActivity
 import java.io.IOException
+import java.lang.Integer.max
+import java.lang.Integer.min
+import java.lang.NumberFormatException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -42,8 +42,8 @@ class Bluetooth(context: Context) : Thread() {
         try {
             ConnectToDevice().execute().get(8000, TimeUnit.MILLISECONDS)
         }
-        catch(e: TimeoutException){
-            backgroundToast(c,"Bluetooth connection timed out!")
+        catch (e: TimeoutException){
+            backgroundToast(c, "Bluetooth connection timed out!")
             mProgress.dismiss()
         }
         while (!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected) {
@@ -58,29 +58,60 @@ class Bluetooth(context: Context) : Thread() {
         if (mBluetoothSocket != null) {
             try{
                 mBluetoothSocket!!.outputStream.write(input.toByteArray())
-            } catch(e: IOException) {
+            } catch (e: IOException) {
                 e.printStackTrace()
             }
         }
+        mBluetoothSocket!!.outputStream.flush()
     }
     private fun retrieveData(socket: BluetoothSocket){
         val inputStream = socket.inputStream
         try {
             val available = inputStream.available()
-            val bytes = ByteArray(available)
+            var bytes = ByteArray(available)
             inputStream.read(bytes, 0, available)
-            val uId = String(bytes)
-            if (uId.length >= 8 ) {
-                isClockedIn(uId) {
-                    if (it) {
-                        clockOutEmployee(uId)
-                        sendCommand("Success on logging out!")
+            val message = String(bytes)
+            val arr = message.split(":").toTypedArray()
+            if (message.length > 2){
+                Log.d("Oscar", "${arr[0]} ${arr[1]}")
+                when (arr[0]){
+                    "u" -> {
+                        if (arr[1].length == 8) {
+                            isClockedIn(arr[1]) {
+                                if (it) {
+                                    clockOutEmployee(arr[1])
+                                    sendCommand("o")
+                                } else {
+                                    clockInEmployee(arr[1])
+                                    MainActivity.currentUId = arr[1]
+                                    MainActivity.notificationHandler = WarningNotificationHandler(
+                                        arr[1],
+                                        c!!
+                                    )
+                                    sendCommand("i")
+                                }
+                            }
+                        }
                     }
-                    else {
-                        clockInEmployee(uId)
-                        MainActivity.currentUId = uId
-                        MainActivity.notificationHandler = WarningNotificationHandler(uId,c!!)
-                        sendCommand("Success on logging in!")
+                    "r" -> {
+                        // Log.d("Oscar", "${arr[1]}")
+                        try{
+                            RadiationFragment.reactorRadiation = min(100, max(1, arr[1].toInt()))
+                        }
+                        catch (e: NumberFormatException){
+                            Log.e("Error", "Could not format string!")
+                        }
+                    }
+                    "s" -> {
+                        // Log.d("Oscar", "${arr[1]}")
+                        if (arr[1] == "true") {
+                            RadiationFragment.isWearingHazmat = true
+                            sendCommand("t:hazmat ON")
+                        }
+                        else {
+                            RadiationFragment.isWearingHazmat = false
+                            sendCommand("h:hazmat OFF")
+                        }
                     }
                 }
             }
@@ -130,11 +161,11 @@ class Bluetooth(context: Context) : Thread() {
             super.onPostExecute(result)
             if (!connectSuccess) {
                 Log.d("Connect", "couldn't connect")
-                backgroundToast(c,"Could not connect to device!")
+                backgroundToast(c, "Could not connect to device!")
             } else {
                 mIsConnected = true
                 Log.d("Connect", "We are connected to bluetooth device.")
-                backgroundToast(c,"Connected!")
+                backgroundToast(c, "Connected!")
 
             }
             mProgress.dismiss()
