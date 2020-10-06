@@ -15,18 +15,16 @@
 #define BAUD_RATE 9600
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);
+
 SoftwareSerial hc06(RX_PIN, TX_PIN);
 
 LiquidCrystal lcd(A0, A1, 7, 6, 5, 4);
 
-bool isLoggedIn = false;
-unsigned long timer = 0;
 int prevVal = 0;
 int hazmatButton = 0;
 int roomButton = 0;
 String msg="";
 String intToString="";
-bool hazmatSuitEquipped = false;
 
 void radiationSimulator() {
   int readVal = analogRead(POT_PIN);
@@ -70,25 +68,12 @@ void roomSimulator(){
   }
 }
 
-void displaySafetyStatus(){
-  
-}
-
-void startTimer(){
-  
-}
-
-void stopTimer(){
-  
-}
-
 void setup() {
   //Initialize Serial Monitor
   Serial.begin(BAUD_RATE);
   SPI.begin();
   mfrc522.PCD_Init();
-  Serial.println("Scan card/pin");
-  Serial.println();
+
   //Initialize Bluetooth Serial Port
   hc06.begin(BAUD_RATE);
 
@@ -99,28 +84,11 @@ void setup() {
 }
 
 void loop() {
-  
-  // set the cursor to column 0, line 1
-  // (note: line 1 is the second row, since counting begins with 0):
-  // lcd.setCursor(0, 1);
-  // print the number of seconds since reset:
-  // lcd.print(millis() / 1000);
 
   // Send radiation level
   radiationSimulator();
   hazmatSuitSimulator();
   roomSimulator();
-  
-  // display timer of when someone is checked in
-  if (timer != 0) {
-    lcd.setCursor(0, 1);
-    lcd.print( (millis() - timer) / 1000);
-  }
-
-  if ( (millis() - timer) / 1000 >= MAX_TIME_SECONDS && isLoggedIn) {
-    lcd.print(" GET OUT!");
-  }
-
   
   //Write data from HC06 to Serial Monitor
   if (hc06.available()) {
@@ -146,7 +114,7 @@ void loop() {
   }
   
     switch(command) {  
-      case 'r': 
+      case 'r':
         // System wide warning
         lcd.clear();
         lcd.print("Get out!");
@@ -168,7 +136,7 @@ void loop() {
         // Interval warning
         lcd.clear();
         lcd.print("Interval warning");
-        delay(300);
+        delay(500);
         break;
       case 't':
         
@@ -220,27 +188,9 @@ void loop() {
     uid += String(mfrc522.uid.uidByte[i], HEX);
   }
   
-  /*if (uid == "d9a7dd56") {
-    if (isLoggedIn) {
-      // Reseting timer so it wont be printed
-      timer = 0;
-      isLoggedIn = false;
-      lcd.clear();
-      lcd.print("Checked out");
-    } else {
-      // Checking in ...
-
-      // Start counting from check in
-      timer = millis();
-      isLoggedIn = true;
-      lcd.clear();
-      lcd.print("Checked in");
-    }
-  }*/
   Serial.print(uid);
   Serial.println();
   hc06.print(uid);
   uid = "";
-
   delay(1000);
 }
