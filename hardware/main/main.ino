@@ -10,6 +10,7 @@
 #define TX_PIN 3
 #define POT_PIN A5
 #define BUTTON_PIN 8
+#define BUTTON_ROOM_PIN A2
 
 #define BAUD_RATE 9600
 
@@ -21,7 +22,8 @@ LiquidCrystal lcd(A0, A1, 7, 6, 5, 4);
 bool isLoggedIn = false;
 unsigned long timer = 0;
 int prevVal = 0;
-int buttonVal = 0;
+int hazmatButton = 0;
+int roomButton = 0;
 String msg="";
 String intToString="";
 bool hazmatSuitEquipped = false;
@@ -39,28 +41,33 @@ void radiationSimulator() {
     hc06.print(sendRadVal);
     Serial.print(sendRadVal);
     Serial.println();
+    delay(100);
   }
-  delay(100);
+  
 }
 
 void hazmatSuitSimulator(){
-  buttonVal = digitalRead(BUTTON_PIN);
-  if (buttonVal == HIGH) {
+  hazmatButton = digitalRead(BUTTON_PIN);
+  if (hazmatButton == HIGH) {
     // Button pressed
-    if (hazmatSuitEquipped) {
-      hazmatSuitEquipped = false;
-      hc06.print("s:false");
-      Serial.print("s:false");
-      Serial.println();
-    } 
-    else {
-      hazmatSuitEquipped = true;
-      hc06.print("s:true");
-      Serial.print("s:true");
-      Serial.println();
-    }
+   
+    hc06.print("s:0");
+    Serial.print("hazmat");
+    Serial.println();   
+    delay(100);
   }
-  delay(100);
+}
+
+void roomSimulator(){
+  roomButton = digitalRead(BUTTON_ROOM_PIN);
+  if(roomButton == HIGH){
+    // Button pressed
+    hc06.print("y:0");
+    Serial.print("room");
+    Serial.println();
+    
+    delay(100);
+  }
 }
 
 void displaySafetyStatus(){
@@ -102,6 +109,7 @@ void loop() {
   // Send radiation level
   radiationSimulator();
   hazmatSuitSimulator();
+  roomSimulator();
   
   // display timer of when someone is checked in
   if (timer != 0) {
@@ -128,7 +136,8 @@ void loop() {
   char command = rxMsg[0];
   
   
-  String timer = rxMsg.substring(2);
+  String timer = "Time:";
+  timer += rxMsg.substring(2);
   Serial.print(timer);
   Serial.println();
   // special case
@@ -148,6 +157,7 @@ void loop() {
         // Check in
         lcd.clear();
         lcd.print("Checked in");
+        delay(300);
         break;
       case 'o': 
         // Check out
@@ -158,14 +168,32 @@ void loop() {
         // Interval warning
         lcd.clear();
         lcd.print("Interval warning");
+        delay(300);
         break;
       case 't':
-        lcd.clear();
+        
+        lcd.setCursor(0,1);
         lcd.print(timer);
         break;
-      default:
+      case '1':
         lcd.clear();
-        lcd.print("inside default");
+        lcd.setCursor(0,0);
+        lcd.print("Break room");
+        
+        break;
+      case '2':
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Control room");
+        
+        break;
+      case '3':
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Reactor room");
+        
+        break;
+      default:
         break;
     }
   }
