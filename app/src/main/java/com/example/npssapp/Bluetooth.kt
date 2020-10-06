@@ -109,7 +109,7 @@ class Bluetooth(context: Context) : Thread() {
                     "y" -> {
                         try{
                             RadiationFragment.roomIndex++
-                            if(RadiationFragment.roomIndex > 3){
+                            if(RadiationFragment.roomIndex > 2){
                                 RadiationFragment.roomIndex = 0
                             }
                         }
