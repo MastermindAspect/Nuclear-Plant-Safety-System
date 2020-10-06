@@ -104,7 +104,7 @@ class Bluetooth(context: Context) : Thread() {
                     }
                     "s" -> {
                         // Log.d("Oscar", "${arr[1]}")
-                        RadiationFragment.isWearingHazmat = arr[1] == "true"
+                        RadiationFragment.isWearingHazmat = !RadiationFragment.isWearingHazmat
                     }
                     "y" -> {
                         try{
