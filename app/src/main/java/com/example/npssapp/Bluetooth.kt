@@ -48,11 +48,7 @@ class Bluetooth(context: Context) : Thread() {
         }
         while (!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected) {
             retrieveData(mBluetoothSocket!!)
-            isClockedIn("asd123") {
-                Log.d("TESTTT", it.toString())
-            }
         }
-
     }
     fun sendCommand(input: String){
         if (mBluetoothSocket != null) {
