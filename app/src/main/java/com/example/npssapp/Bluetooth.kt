@@ -83,6 +83,7 @@ class Bluetooth(context: Context) : Thread() {
                                     sendCommand("o")
                                 } else {
                                     clockInEmployee(arr[1])
+                                    if (MainActivity.currentUId != "") MainActivity.currentUId = arr[1]
                                     MainActivity.currentUId = arr[1]
                                     MainActivity.notificationHandler = WarningNotificationHandler(
                                         arr[1],
