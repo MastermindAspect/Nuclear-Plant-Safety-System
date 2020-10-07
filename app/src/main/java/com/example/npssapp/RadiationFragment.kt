@@ -93,7 +93,7 @@ class RadiationFragment : Fragment() {
 
                     if (counter in q){
                         try {
-                            MainActivity.notificationHandler!!.sendRadiationNotification()
+                            MainActivity.notificationHandler!!.sendRadiationNotification("Radiation warning", "Reaching maximum exposure in $counter")
                             MainActivity.notificationHandler!!.wakePhoneScreen()
                             try {
                                 MainActivity.mBluetoothContext!!.sendCommand("n")
@@ -109,7 +109,7 @@ class RadiationFragment : Fragment() {
                 }
                 override fun onFinish() {
                     try {
-                        MainActivity.notificationHandler!!.sendRadiationNotification()
+                        MainActivity.notificationHandler!!.sendRadiationNotification("GET OUT!", "Maximum exposure reached!")
                         MainActivity.notificationHandler!!.wakePhoneScreen()
                         try {
                             MainActivity.mBluetoothContext!!.sendCommand("r")

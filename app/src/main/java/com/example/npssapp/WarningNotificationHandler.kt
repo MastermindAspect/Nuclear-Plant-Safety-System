@@ -18,7 +18,7 @@ import com.google.firebase.ktx.Firebase
 
 data class WarningNotificationHandler(val uId: String, val context: Context) {
 
-    fun sendRadiationNotification() {
+    fun sendRadiationNotification(title: String, description: String) {
         //intent which determines where user ends up when pressing notification
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -27,8 +27,8 @@ data class WarningNotificationHandler(val uId: String, val context: Context) {
 
         val builder = NotificationCompat.Builder(context, 5.toString())
             .setSmallIcon(R.drawable.ic_stat_warning)
-            .setContentTitle("Radiation limit reached.")
-            .setContentText("WARNING: You have reached the radiation limit.")
+            .setContentTitle(title)
+            .setContentText(description)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
