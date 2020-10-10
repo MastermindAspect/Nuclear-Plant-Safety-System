@@ -14,12 +14,16 @@
 
 #define BAUD_RATE 9600
 
+enum s_room{CONTROL, REACTOR, BREAK};
+
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 SoftwareSerial hc06(RX_PIN, TX_PIN);
 
 LiquidCrystal lcd(A0, A1, 7, 6, 5, 4);
 
+
+enum s_room current_room = BREAK;
 int prevVal = 0;
 int hazmatButton = 0;
 int roomButton = 0;
@@ -56,7 +60,7 @@ void hazmatSuitSimulator(){
   }
 }
 
-void roomSimulator(){
+void changeRoom(){
   roomButton = digitalRead(BUTTON_ROOM_PIN);
   if(roomButton == HIGH){
     // Button pressed
@@ -88,7 +92,7 @@ void loop() {
   // Send radiation level
   radiationSimulator();
   hazmatSuitSimulator();
-  roomSimulator();
+  changeRoom();
   
   //Write data from HC06 to Serial Monitor
   if (hc06.available()) {
@@ -100,14 +104,12 @@ void loop() {
         rxMsg += c;
       }
     }
-  
+  Serial.print(rxMsg);
+  Serial.println();
   char command = rxMsg[0];
   
-  
-  String timer = "Time:";
-  timer += rxMsg.substring(2);
-  Serial.print(timer);
-  Serial.println();
+  // String timer = rxMsg.substring(2);
+  String timer = rxMsg;
   // special case
   if (timer[timer.length() - 1] == 'n'){
     command = 'n';
@@ -117,9 +119,7 @@ void loop() {
       case 'r':
         // System wide warning
         lcd.clear();
-        lcd.print("Get out!");
-        lcd.setCursor(0,1);
-        lcd.print("It's hot!");
+        lcd.print("Get out NOW!");
         break;
       case 'i': 
         // Check in
@@ -136,30 +136,49 @@ void loop() {
         // Interval warning
         lcd.clear();
         lcd.print("Interval warning");
-        delay(500);
+        delay(1500);
+        
+        if (current_room == BREAK) {
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Break room");
+          current_room = BREAK;
+        }
+        else if (current_room == CONTROL) {
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Control room");
+          current_room = CONTROL;
+        }
+        else {
+          lcd.clear();
+          lcd.setCursor(0,0);
+          lcd.print("Reactor room");
+          current_room = REACTOR;
+        }
         break;
       case 't':
-        
         lcd.setCursor(0,1);
         lcd.print(timer);
+        lcd.print("              ");
         break;
       case '1':
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("Break room");
-        
+        current_room = BREAK;
         break;
       case '2':
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("Control room");
-        
+        current_room = CONTROL;
         break;
       case '3':
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("Reactor room");
-        
+        current_room = REACTOR;
         break;
       default:
         break;
