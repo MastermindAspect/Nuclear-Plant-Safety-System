@@ -5,7 +5,6 @@
 
 #define SS_PIN 10
 #define RST_PIN 9
-#define MAX_TIME_SECONDS 10
 #define RX_PIN 2
 #define TX_PIN 3
 #define POT_PIN A5
@@ -30,6 +29,11 @@ int roomButton = 0;
 String msg="";
 String intToString="";
 
+/*
+* Reads the potentiometer value and sends it as a
+* type String to the app, only sends after it has changed more
+* than 5 units, to prevent "spamming" the app.
+*/
 void radiationSimulator() {
   int readVal = analogRead(POT_PIN);
   readVal /= 10;
@@ -45,9 +49,12 @@ void radiationSimulator() {
     Serial.println();
     delay(100);
   }
-  
 }
 
+/*
+* Checks the button that is connected to the hazmat suit.
+* if clicked, sends a message to the app to toggle the suit
+*/
 void hazmatSuitSimulator(){
   hazmatButton = digitalRead(BUTTON_PIN);
   if (hazmatButton == HIGH) {
@@ -60,7 +67,15 @@ void hazmatSuitSimulator(){
   }
 }
 
+<<<<<<< HEAD
 void changeRoom(){
+=======
+/*
+* Checks the button to change rooms. When clicked
+* Sends a message to the app that indicates to change room
+*/
+void roomSimulator(){
+>>>>>>> 3b1fe8f5c0f269279d5309ff92067f655aaac4f8
   roomButton = digitalRead(BUTTON_ROOM_PIN);
   if(roomButton == HIGH){
     // Button pressed

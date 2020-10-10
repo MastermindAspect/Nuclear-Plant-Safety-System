@@ -48,11 +48,7 @@ class Bluetooth(context: Context) : Thread() {
         }
         while (!currentThread().isInterrupted && mBluetoothSocket != null && mIsConnected) {
             retrieveData(mBluetoothSocket!!)
-            isClockedIn("asd123") {
-                Log.d("TESTTT", it.toString())
-            }
         }
-
     }
     fun sendCommand(input: String){
         if (mBluetoothSocket != null) {
@@ -83,6 +79,7 @@ class Bluetooth(context: Context) : Thread() {
                                     sendCommand("o")
                                 } else {
                                     clockInEmployee(arr[1])
+                                    if (MainActivity.currentUId != "") MainActivity.currentUId = arr[1]
                                     MainActivity.currentUId = arr[1]
                                     MainActivity.notificationHandler = WarningNotificationHandler(
                                         arr[1],
