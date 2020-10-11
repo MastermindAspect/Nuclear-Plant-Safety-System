@@ -35,20 +35,20 @@ String intToString="";
 * than 5 units, to prevent "spamming" the app.
 */
 void radiationSimulator() {
-  int readVal = analogRead(POT_PIN);
-  readVal /= 10;
+    int readVal = analogRead(POT_PIN);
+    readVal /= 10;
  
-  if ( abs(readVal - prevVal) > 5 ) {
-    // send msg
-    prevVal = readVal;
-    msg = "r:";
-    intToString = String(prevVal);
-    String sendRadVal =  msg + intToString;
-    hc06.print(sendRadVal);
-    Serial.print(sendRadVal);
-    Serial.println();
-    delay(100);
-  }
+    if ( abs(readVal - prevVal) > 5 ) {
+        // send msg
+        prevVal = readVal;
+        msg = "r:";
+        intToString = String(prevVal);
+        String sendRadVal =  msg + intToString;
+        hc06.print(sendRadVal);
+        Serial.print(sendRadVal);
+        Serial.println();
+        delay(100);
+    }
 }
 
 /*
@@ -56,175 +56,171 @@ void radiationSimulator() {
 * if clicked, sends a message to the app to toggle the suit
 */
 void hazmatSuitSimulator(){
-  hazmatButton = digitalRead(BUTTON_PIN);
-  if (hazmatButton == HIGH) {
-    // Button pressed
-   
-    hc06.print("s:0");
-    Serial.print("hazmat");
-    Serial.println();   
-    delay(100);
-  }
+    hazmatButton = digitalRead(BUTTON_PIN);
+    if (hazmatButton == HIGH) {
+        // Button pressed
+    
+        hc06.print("s:0");
+        Serial.print("hazmat");
+        Serial.println();   
+        delay(100);
+    }
 }
 
-<<<<<<< HEAD
-void changeRoom(){
-=======
 /*
 * Checks the button to change rooms. When clicked
 * Sends a message to the app that indicates to change room
 */
 void roomSimulator(){
->>>>>>> 3b1fe8f5c0f269279d5309ff92067f655aaac4f8
-  roomButton = digitalRead(BUTTON_ROOM_PIN);
-  if(roomButton == HIGH){
-    // Button pressed
-    hc06.print("y:0");
-    Serial.print("room");
-    Serial.println();
-    
-    delay(100);
-  }
+    roomButton = digitalRead(BUTTON_ROOM_PIN);
+    if(roomButton == HIGH){
+        // Button pressed
+        hc06.print("y:0");
+        Serial.print("room");
+        Serial.println();
+        
+        delay(100);
+    }
 }
 
 void setup() {
-  //Initialize Serial Monitor
-  Serial.begin(BAUD_RATE);
-  SPI.begin();
-  mfrc522.PCD_Init();
+    //Initialize Serial Monitor
+    Serial.begin(BAUD_RATE);
+    SPI.begin();
+    mfrc522.PCD_Init();
 
-  //Initialize Bluetooth Serial Port
-  hc06.begin(BAUD_RATE);
+    //Initialize Bluetooth Serial Port
+    hc06.begin(BAUD_RATE);
 
-  // set up the LCD's number of columns and rows:
-  lcd.begin(16, 2);
-  // Print a message to the LCD.
-  lcd.print("Setup done");
+    // set up the LCD's number of columns and rows:
+    lcd.begin(16, 2);
+    // Print a message to the LCD.
+    lcd.print("Setup done");
 }
 
 void loop() {
 
-  // Send radiation level
-  radiationSimulator();
-  hazmatSuitSimulator();
-  changeRoom();
-  
-  //Write data from HC06 to Serial Monitor
-  if (hc06.available()) {
-    String rxMsg;
-    while(hc06.available()){
-      delay(1);
-      if(hc06.available() > 0){
-        char c = hc06.read();
-        rxMsg += c;
-      }
+    // Send radiation level
+    radiationSimulator();
+    hazmatSuitSimulator();
+    roomSimulator();
+    
+    //Write data from HC06 to Serial Monitor
+    if (hc06.available()) {
+        String rxMsg;
+        while(hc06.available()){
+        delay(1);
+        if(hc06.available() > 0){
+            char c = hc06.read();
+            rxMsg += c;
+        }
+        }
+    Serial.print(rxMsg);
+    Serial.println();
+    char command = rxMsg[0];
+    
+    // String timer = rxMsg.substring(2);
+    String timer = rxMsg;
+    // special case
+    if (timer[timer.length() - 1] == 'n'){
+        command = 'n';
     }
-  Serial.print(rxMsg);
-  Serial.println();
-  char command = rxMsg[0];
-  
-  // String timer = rxMsg.substring(2);
-  String timer = rxMsg;
-  // special case
-  if (timer[timer.length() - 1] == 'n'){
-    command = 'n';
-  }
-  
+    
     switch(command) {  
-      case 'r':
-        // System wide warning
-        lcd.clear();
-        lcd.print("Get out NOW!");
-        break;
-      case 'i': 
-        // Check in
-        lcd.clear();
-        lcd.print("Checked in");
-        delay(300);
-        break;
-      case 'o': 
-        // Check out
-        lcd.clear();
-        lcd.print("Checked out");
-        break;
-      case 'n': 
-        // Interval warning
-        lcd.clear();
-        lcd.print("Interval warning");
-        delay(1500);
-        
-        if (current_room == BREAK) {
-          lcd.clear();
-          lcd.setCursor(0,0);
-          lcd.print("Break room");
-          current_room = BREAK;
+        case 'r':
+            // System wide warning
+            lcd.clear();
+            lcd.print("Get out NOW!");
+            break;
+        case 'i': 
+            // Check in
+            lcd.clear();
+            lcd.print("Checked in");
+            delay(300);
+            break;
+        case 'o': 
+            // Check out
+            lcd.clear();
+            lcd.print("Checked out");
+            break;
+        case 'n': 
+            // Interval warning
+            lcd.clear();
+            lcd.print("Interval warning");
+            delay(1500);
+            
+            if (current_room == BREAK) {
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Break room");
+            current_room = BREAK;
+            }
+            else if (current_room == CONTROL) {
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Control room");
+            current_room = CONTROL;
+            }
+            else {
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Reactor room");
+            current_room = REACTOR;
+            }
+            break;
+        case 't':
+            lcd.setCursor(0,1);
+            lcd.print(timer);
+            lcd.print("              ");
+            break;
+        case '1':
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Break room");
+            current_room = BREAK;
+            break;
+        case '2':
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Control room");
+            current_room = CONTROL;
+            break;
+        case '3':
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print("Reactor room");
+            current_room = REACTOR;
+            break;
+        default:
+            break;
         }
-        else if (current_room == CONTROL) {
-          lcd.clear();
-          lcd.setCursor(0,0);
-          lcd.print("Control room");
-          current_room = CONTROL;
-        }
-        else {
-          lcd.clear();
-          lcd.setCursor(0,0);
-          lcd.print("Reactor room");
-          current_room = REACTOR;
-        }
-        break;
-      case 't':
-        lcd.setCursor(0,1);
-        lcd.print(timer);
-        lcd.print("              ");
-        break;
-      case '1':
-        lcd.clear();
-        lcd.setCursor(0,0);
-        lcd.print("Break room");
-        current_room = BREAK;
-        break;
-      case '2':
-        lcd.clear();
-        lcd.setCursor(0,0);
-        lcd.print("Control room");
-        current_room = CONTROL;
-        break;
-      case '3':
-        lcd.clear();
-        lcd.setCursor(0,0);
-        lcd.print("Reactor room");
-        current_room = REACTOR;
-        break;
-      default:
-        break;
     }
-  }
   
-  if (hc06.available()){
-    Serial.write(hc06.read());
-  }
+    if (hc06.available()){
+        Serial.write(hc06.read());
+    }
 
-  
-  //Write from Serial Monitor to HC06
-  if (Serial.available()) {
-    hc06.write(Serial.read());
-  }
-  
-  if (!mfrc522.PICC_IsNewCardPresent()) {
-    return;
-  }
-  if (!mfrc522.PICC_ReadCardSerial()) {
-    return;
-  }
+    
+    //Write from Serial Monitor to HC06
+    if (Serial.available()) {
+        hc06.write(Serial.read());
+    }
+    
+    if (!mfrc522.PICC_IsNewCardPresent()) {
+        return;
+    }
+    if (!mfrc522.PICC_ReadCardSerial()) {
+        return;
+    }
 
-  String uid = "u:";
-  for (byte i = 0; i < mfrc522.uid.size; i++) {
-    uid += String(mfrc522.uid.uidByte[i], HEX);
-  }
-  
-  Serial.print(uid);
-  Serial.println();
-  hc06.print(uid);
-  uid = "";
-  delay(1000);
+    String uid = "u:";
+    for (byte i = 0; i < mfrc522.uid.size; i++) {
+        uid += String(mfrc522.uid.uidByte[i], HEX);
+    }
+    
+    Serial.print(uid);
+    Serial.println();
+    hc06.print(uid);
+    uid = "";
+    delay(1000);
 }
