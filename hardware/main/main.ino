@@ -105,7 +105,7 @@ void loop() {
     hazmatSuitSimulator();
     roomSimulator();
     
-    //Write data from HC06 to Serial Monitor
+    // The bluetooth module waits for message and puts it in rxMsg
     if (hc06.available()) {
         String rxMsg;
         while(hc06.available()){
