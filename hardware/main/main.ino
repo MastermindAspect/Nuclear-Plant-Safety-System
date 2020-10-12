@@ -109,21 +109,20 @@ void loop() {
     if (hc06.available()) {
         String rxMsg;
         while(hc06.available()){
-        delay(1);
-        if(hc06.available() > 0){
-            char c = hc06.read();
-            rxMsg += c;
+            delay(1);
+            if(hc06.available() > 0){
+                char c = hc06.read();
+                rxMsg += c;
+            }
         }
-        }
-    Serial.print(rxMsg);
-    Serial.println();
-    char command = rxMsg[0];
-    
-    // String timer = rxMsg.substring(2);
-    String timer = rxMsg;
-    // special case
-    if (timer[timer.length() - 1] == 'n'){
-        command = 'n';
+        Serial.print(rxMsg);
+        Serial.println();
+        char command = rxMsg[0];
+        
+        String timer = rxMsg;
+        // special case
+        if (timer[timer.length() - 1] == 'n'){
+            command = 'n';
     }
     
     switch(command) {  
