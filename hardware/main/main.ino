@@ -194,16 +194,6 @@ void loop() {
             break;
         }
     }
-  
-    if (hc06.available()){
-        Serial.write(hc06.read());
-    }
-
-    
-    //Write from Serial Monitor to HC06
-    if (Serial.available()) {
-        hc06.write(Serial.read());
-    }
     
     if (!mfrc522.PICC_IsNewCardPresent()) {
         return;
