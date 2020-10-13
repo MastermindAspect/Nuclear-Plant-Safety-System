@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.fragment_radiation.*
+import java.lang.Long.min
+import kotlin.math.max
 
 class RadiationFragment : Fragment() {
     companion object{
@@ -67,7 +69,7 @@ class RadiationFragment : Fragment() {
             var tempEstimated : Long = 0
             object : CountDownTimer((estimatedTimeRemaining()*1000)-secondsPassed*1000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
-                    var counter = estimatedTimeRemaining() - secondsPassed
+                    var counter = max(1, estimatedTimeRemaining() - secondsPassed)
                     if (tempEstimated != estimatedTimeRemaining()){
                         q[0] = counter/2 + counter/4
                         q[1] = counter/2
@@ -91,7 +93,7 @@ class RadiationFragment : Fragment() {
 
                     if (counter in q){
                         try {
-                            MainActivity.notificationHandler!!.sendRadiationNotification()
+                            MainActivity.notificationHandler!!.sendRadiationNotification("Radiation warning", "Reaching maximum exposure in $counter")
                             MainActivity.notificationHandler!!.wakePhoneScreen()
                             try {
                                 MainActivity.mBluetoothContext!!.sendCommand("n")
@@ -107,7 +109,7 @@ class RadiationFragment : Fragment() {
                 }
                 override fun onFinish() {
                     try {
-                        MainActivity.notificationHandler!!.sendRadiationNotification()
+                        MainActivity.notificationHandler!!.sendRadiationNotification("GET OUT!", "Maximum exposure reached!")
                         MainActivity.notificationHandler!!.wakePhoneScreen()
                         try {
                             MainActivity.mBluetoothContext!!.sendCommand("r")
@@ -150,6 +152,4 @@ class RadiationFragment : Fragment() {
             }
         })
     }
-
-
 }
