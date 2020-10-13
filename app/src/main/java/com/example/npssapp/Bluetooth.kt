@@ -80,10 +80,11 @@ class Bluetooth(context: Context) : Thread() {
                             isClockedIn(arr[1]) {
                                 if (it) {
                                     clockOutEmployee(arr[1])
+                                    MainActivity.currentUId = ""
                                     sendCommand("o")
                                 } else {
                                     clockInEmployee(arr[1])
-                                    if (MainActivity.currentUId != "")MainActivity.currentUId = arr[1]
+                                    if (MainActivity.currentUId == "")MainActivity.currentUId = arr[1]
                                     MainActivity.notificationHandler = WarningNotificationHandler(
                                         arr[1],
                                         c!!
@@ -94,7 +95,6 @@ class Bluetooth(context: Context) : Thread() {
                         }
                     }
                     "r" -> {
-                        // Log.d("Oscar", "${arr[1]}")
                         try{
                             RadiationFragment.reactorRadiation = min(100, max(1, arr[1].toInt()))
                         }
@@ -103,7 +103,6 @@ class Bluetooth(context: Context) : Thread() {
                         }
                     }
                     "s" -> {
-                        // Log.d("Oscar", "${arr[1]}")
                         RadiationFragment.isWearingHazmat = !RadiationFragment.isWearingHazmat
                     }
                     "y" -> {
