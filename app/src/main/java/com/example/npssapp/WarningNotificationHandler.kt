@@ -16,7 +16,9 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 
-data class WarningNotificationHandler(val uId: String, val context: Context) {
+data class WarningNotificationHandler(val uId: String, val context: Context, val channelId: Int) {
+    private val notificationId = 123
+
 
     fun sendRadiationNotification(title: String, description: String) {
         //intent which determines where user ends up when pressing notification
@@ -25,7 +27,7 @@ data class WarningNotificationHandler(val uId: String, val context: Context) {
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
-        val builder = NotificationCompat.Builder(context, 5.toString())
+        val builder = NotificationCompat.Builder(context, channelId.toString())
             .setSmallIcon(R.drawable.ic_stat_warning)
             .setContentTitle(title)
             .setContentText(description)
@@ -35,7 +37,7 @@ data class WarningNotificationHandler(val uId: String, val context: Context) {
 
         with(NotificationManagerCompat.from(context)) {
             // notificationId is a unique int for each notification that you must define
-            notify(123, builder.build())
+            notify(notificationId, builder.build())
         }
     }
 

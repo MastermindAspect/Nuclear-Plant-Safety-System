@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         var mBluetoothContext : Bluetooth? = null
         var currentUId : String = ""
         var notificationHandler : WarningNotificationHandler? = null
+        const val CHANNEL_ID = 5
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                 .setUsage(AudioAttributes.USAGE_ALARM)
                 .build()
 
-            val channel = NotificationChannel(5.toString(), name, importance).apply {
+            val channel = NotificationChannel(CHANNEL_ID.toString(), name, importance).apply {
                 description = descriptionText
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 setSound(soundUri, attributes)
