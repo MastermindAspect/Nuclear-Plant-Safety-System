@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import com.example.npssapp.MainActivity.Companion.CHANNEL_ID
 import com.example.npssapp.MainActivity.Companion.mProgress
 import java.io.IOException
 import java.lang.Integer.max
@@ -86,7 +87,8 @@ class Bluetooth(context: Context) : Thread() {
                                     MainActivity.currentUId = arr[1]
                                     MainActivity.notificationHandler = WarningNotificationHandler(
                                         arr[1],
-                                        c!!
+                                        c!!,
+                                        CHANNEL_ID
                                     )
                                     sendCommand("i")
                                 }
